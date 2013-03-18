@@ -4,3 +4,6 @@ body {
 svg { 
 	/*border: 1px solid black; */
 }
+#inputVideo {
+  magin: 0 auto;
+}
