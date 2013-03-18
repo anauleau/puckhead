@@ -33,6 +33,6 @@ window.onload = function() {
     return paddle;
   };
 
-  var paddle1 = makePaddle(1);
-  var paddle2 = makePaddle(2);
+  window.paddle1 = makePaddle(1);
+  window.paddle2 = makePaddle(2);
 };
