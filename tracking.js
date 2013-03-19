@@ -91,12 +91,12 @@ window.onload = function() {
 
   var detectCollisionsWithWalls = function (){
     var collision = false;
-    if ( (puck.attrs.cx <= (puckRadius + gatesWidth)) && (puck.attrs.cy <= gatesHeight*1.1 || puck.attrs.cy >= height-gatesHeight ) ) {
+    if ( (puck.attrs.cx <= (puckRadius + gatesWidth)) && (puck.attrs.cy <= gatesHeight || puck.attrs.cy >= height-gatesHeight ) ) {
       collision = true;
       puck.attrs.cx = puckRadius + gatesWidth;
       puckXVelocity = (-1)*puckXVelocity;
     }
-    if ( (puck.attrs.cx >= (width - puckRadius - gatesWidth)) && (puck.attrs.cy <= gatesHeight*1.1 || puck.attrs.cy >= height-gatesHeight ) ) {
+    if ( (puck.attrs.cx >= (width - puckRadius - gatesWidth)) && (puck.attrs.cy <= gatesHeight || puck.attrs.cy >= height-gatesHeight ) ) {
       collision = true;
       puck.attrs.cx = width - puckRadius - gatesWidth;
       puckXVelocity = (-1)*puckXVelocity;
@@ -115,13 +115,13 @@ window.onload = function() {
   };
 
   var detectCollisionsWithGoalPosts = function(){
-    if ( ( (0+puckRadius <= puck.attrs.cx && puck.attrs.cx <= (puckRadius + gatesWidth)) && (puck.attrs.cy <= gatesHeight+puckRadius) ) 
-          || ( (0+puckRadius <= puck.attrs.cx && puck.attrs.cx <= (puckRadius + gatesWidth)) && (puck.attrs.cy >= height-gatesHeight-puckRadius) )
+    if  ( ( (puckRadius >= puck.attrs.cx) && (puck.attrs.cx <= (puckRadius + gatesWidth) ) ) && (puck.attrs.cy <= gatesHeight+puckRadius) 
           || ( (width-puckRadius-gatesWidth <= puck.attrs.cx && puck.attrs.cx <= width-puckRadius ) && (puck.attrs.cy <= gatesHeight+puckRadius) )
+          || ( (0+puckRadius <= puck.attrs.cx && puck.attrs.cx <= (puckRadius + gatesWidth)) && (puck.attrs.cy >= height-gatesHeight-puckRadius) ) 
           || ( (width-puckRadius-gatesWidth <= puck.attrs.cx && puck.attrs.cx <= width-puckRadius ) && (puck.attrs.cy >= height-gatesHeight-puckRadius) )
-    ) {
-        puckYVelocity = (-1)*puckYVelocity;
-      }
+      ){
+      puckYVelocity = (-1)*puckYVelocity;
+    }
   };
 
   var detectCollisionsWithMallets = function() {
@@ -147,8 +147,10 @@ window.onload = function() {
         puckXVelocity = (-1) * puckYVelocity * charr;
         puckYVelocity = (-1) * vel * charr;
       } else {
-        puckXVelocity += malletXVelocity;
-        puckYVelocity += malletYVelocity;
+        var vel = puckXVelocity;
+        var charr = (puckXVelocity/puckYVelocity) / Math.abs(puckXVelocity/puckYVelocity);
+        puckXVelocity = (-1) * puckYVelocity * charr + malletXVelocity;
+        puckYVelocity = (-1) * vel * charr + malletYVelocity;
       }
     }
   };
