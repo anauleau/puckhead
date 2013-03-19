@@ -1,127 +1,154 @@
 window.onload = function() {
 
-  var width = window.innerWidth;
-  var height = window.innerHeight;
+  // Define a board dimensions and draw the board.
+
+  if ( window.innerWidth > window.innerHeight*2 ){
+    var width = window.innerHeight*2;
+    var height = window.innerHeight;
+  } else {
+    var width = window.innerWidth;
+    var height = window.innerWidth/2;
+  }
+
+  var sizeUnit = height/100;
 
   var paper = new Raphael(document.getElementById('canvas_container'), width, height);
 
-  paper.path("M"+width/2+",0L"+width/2+","+height);
-  paper.rect(0, 0, width/50, height/3).attr({fill:'#999'});
-  paper.rect(0, height*2/3, width/50, height/3).attr({fill:'#999'});
-  paper.rect(width-width/50, 0, width/50, height/3).attr({fill:'#999'});
-  paper.rect(width-width/50, height*2/3, width/50, height/3).attr({fill:'#999'});
+  // Drow gates and marking.
 
-  paper.circle(width/50, height/2, height/2);
-  paper.circle(width-width/50, height/2, height/2);
+  var gatesWidth = 5*sizeUnit;
+  var gatesHeight = 33*sizeUnit;
+
+  paper.path("M"+width/2+",0L"+width/2+","+height);
+  paper.rect(0, 0, gatesWidth, gatesHeight).attr({fill:'#999'});
+  paper.rect(0, height-gatesHeight, gatesWidth, gatesHeight).attr({fill:'#999'});
+  paper.rect(width-gatesWidth, 0, gatesWidth, gatesHeight).attr({fill:'#999'});
+  paper.rect(width-gatesWidth, height-gatesHeight, gatesWidth, gatesHeight).attr({fill:'#999'});
+
+  paper.circle(gatesWidth, height/2, height/2);
+  paper.circle(width-gatesWidth, height/2, height/2);
   paper.circle(width/2, height/2, height/5);
 
-  puck = paper.circle(width/2, height/2, height/25);
+  // Draw puck and mallets.
+
+  var malletRadius = 5*sizeUnit;
+  var puckRadius = 3.5*sizeUnit;
+
+  puck = paper.circle(width/2, height/2, puckRadius);
   puck.attr({fill: '#333'});
 
-  puck.node.onclick = function() {
-    puck.attr('cx', puck.attrs.cx - 10);
-  };
-
-  var makePaddle = function(player) {
+  var makeMallet = function(player) {
     if (player === 1) {
-      var paddle = paper.circle(height/4, height/2, height/20);
-      paddle.attr({fill: '#F00'});
+      var mallet = paper.circle(height/4, height/2, malletRadius);
+      mallet.attr({fill: '#F00'});
     } else {
-      var paddle = paper.circle(width-height/4, height/2, height/20);
-      paddle.attr({fill: '#00F'});
+      var mallet = paper.circle(width-height/4, height/2, malletRadius);
+      mallet.attr({fill: '#00F'});
     }
-    return paddle;
+    return mallet;
   };
 
-  var paddle1 = makePaddle(1);
-  var paddle2 = makePaddle(2);
+  var mallet1 = makeMallet(1);
+  var mallet2 = makeMallet(2);
 
-  var puckXVelocity = -25;
-  var puckYVelocity = 10;
+  var puckXVelocity = -45;
+  var puckYVelocity = 70;
 
-  // var paddleRadius = height/20;
-  var paddleXVelocity = 0;
-  var paddleYVelocity = 0;
-  var oldPaddleX = height/4;
-  var oldPaddleY = height/2;
+  var malletXVelocity = 0;
+  var malletYVelocity = 0;
+  var oldMalletX = height/4;
+  var oldMalletY = height/2;
 
-  var detectCollisions = function(){
-    return false;
+  var watchMallet = function(){
+    malletXVelocity =  mallet1.attrs.cx - oldMalletX;
+    malletYVelocity = mallet1.attrs.cy - oldMalletY; 
   };
 
-  var watchPaddle = function(){
-    // paddleXVelocity =  paddle1.attrs.cx - oldPaddleX;
-    // changePaddleY = paddle1.attrs.cy - oldPaddleY; 
+  var moveMallet = function(){
     var xMinus = Math.random();
     var yMinus = Math.random();
-    paddleXVelocity = Math.random() * 300;
-    paddleYVelocity = Math.random() * 300;
-    if ( (xMinus>0.5 || ((paddle1.attrs.cx + paddleXVelocity)>width) ) && (paddle1.attrs.cx - paddleXVelocity>0) ) {
-      paddleXVelocity = paddleXVelocity*(-1);
+    malletXVelocity = Math.random() * 100;
+    malletYVelocity = Math.random() * 100;
+    if ( (xMinus>0.5 || ((mallet1.attrs.cx + malletXVelocity)>width) ) && (mallet1.attrs.cx - malletXVelocity>0) ) {
+      malletXVelocity = malletXVelocity*(-1);
     }
-    if ( (yMinus>0.5 || ((paddle1.attrs.cy + paddleYVelocity)>height) ) && (paddle1.attrs.cy - paddleYVelocity>0) ){
-      paddleYVelocity = paddleYVelocity*(-1);
+    if ( (yMinus>0.5 || ((mallet1.attrs.cy + malletYVelocity)>height) ) && (mallet1.attrs.cy - malletYVelocity>0) ){
+      malletYVelocity = malletYVelocity*(-1);
     }
-    paddle1.attr('cx', paddle1.attrs.cx + paddleXVelocity );
-    paddle1.attr('cy', paddle1.attrs.cy + paddleYVelocity );
+    mallet1.attr('cx', mallet1.attrs.cx + malletXVelocity );
+    mallet1.attr('cy', mallet1.attrs.cy + malletYVelocity );
   };
 
   var movePuck = function(){
     puck.attr('cx', puck.attrs.cx + puckXVelocity );
     puck.attr('cy', puck.attrs.cy + puckYVelocity );
     // console.log('x: '+puck.attrs.cx+', y: '+puck.attrs.cy);
-    puckXVelocity *= 0.95;
-    puckYVelocity *= 0.95;
+    puckXVelocity *= 0.99;
+    puckYVelocity *= 0.99;
   };
 
-  var detectCollisions = function(){
-
-    var collisionTypes = [];
-
-    var detectCollisionsWithWalls = function (){
-      if (puck.attr('cx') <= height/25 + width/50 && ) {
-        // puck.attr('cx', puck.attrs.cx + 50);
-      }
-      else if (puck.attr('cx') >= width - height/25){
-        puck.attr('cx', puck.attrs.cx - 50);
-      }
-      else if (puck.attr('cy') <= height/24){
-        puck.attr('cy', puck.attrs.cy + 100);
-      }
-      else if (puck.attr('cy') >= height * (24/25)){
-        puck.attr('cy', puck.attrs.cy - 50);
-      }
-    };
-
-    var detectCollisionsWithPaddles = function() {
-      var xDiff = (puck.attr('cx') - paddle1.attr('cx'));
-      var yDiff = (puck.attr('cy') - paddle1.attr('cy'));
-      var xDiffSquared = Math.pow(xDiff, 2);
-      var yDiffSquared = Math.pow(yDiff, 2);
-      var distance = Math.sqrt(xDiffSquared + yDiffSquared);
-      if(distance < ((height/20) + (height/25))){
-        console.log("No touching!");
-      }
-    };
-
-    return collisionType;
-
+  var detectCollisionsWithWalls = function (){
+    var collision = false;
+    if ( (puck.attrs.cx <= (puckRadius + gatesWidth)) && (puck.attrs.cy <= gatesHeight*1.1 || puck.attrs.cy >= height-gatesHeight ) ) {
+      collision = true;
+      puck.attrs.cx = puckRadius + gatesWidth;
+      puckXVelocity = (-1)*puckXVelocity;
+    }
+    if ( (puck.attrs.cx >= (width - puckRadius - gatesWidth)) && (puck.attrs.cy <= gatesHeight*1.1 || puck.attrs.cy >= height-gatesHeight ) ) {
+      collision = true;
+      puck.attrs.cx = width - puckRadius - gatesWidth;
+      puckXVelocity = (-1)*puckXVelocity;
+    }
+    if (puck.attrs.cy <= puckRadius+2){
+      collision = true;
+      puck.attrs.cy = puckRadius;
+      puckYVelocity = (-1)*puckYVelocity;
+    }
+    if (puck.attrs.cy >= height-puckRadius){
+      collision = true;
+      puck.attrs.cy = height - puckRadius;
+      puckYVelocity = (-1)*puckYVelocity;
+    }
+    return collision;
   };
-   
 
+  var detectCollisionsWithGoalPosts = function(){
+    if ( ( (0+puckRadius <= puck.attrs.cx && puck.attrs.cx <= (puckRadius + gatesWidth)) && (puck.attrs.cy <= gatesHeight+puckRadius) ) 
+          || ( (0+puckRadius <= puck.attrs.cx && puck.attrs.cx <= (puckRadius + gatesWidth)) && (puck.attrs.cy >= height-gatesHeight-puckRadius) )
+          || ( (width-puckRadius-gatesWidth <= puck.attrs.cx && puck.attrs.cx <= width-puckRadius ) && (puck.attrs.cy <= gatesHeight+puckRadius) )
+          || ( (width-puckRadius-gatesWidth <= puck.attrs.cx && puck.attrs.cx <= width-puckRadius ) && (puck.attrs.cy >= height-gatesHeight-puckRadius) )
+    ) {
+        puckYVelocity = (-1)*puckYVelocity;
+      }
+  };
 
+  var detectCollisionsWithPaddles = function() {
+    var xDiff = (puck.attrs.cx - mallet1.attr('cx'));
+    var yDiff = (puck.attr('cy') - mallet1.attr('cy'));
+    var xDiffSquared = Math.pow(xDiff, 2);
+    var yDiffSquared = Math.pow(yDiff, 2);
+    var distance = Math.sqrt(xDiffSquared + yDiffSquared);
+    if(distance < ((height/20) + (height/25))){
+      puckXVelocity += malletXVelocity/60;
+      puckYVelocity += malletYVelocity/60;
+    }
+  };
 
   setInterval(function(){
-    // watchPaddle();
-    if (detectCollisions()){
-      console.log('Collision!');
-    };
+    if ( !detectCollisionsWithWalls() ){
+      detectCollisionsWithGoalPosts();
+    }
+    detectCollisionsWithPaddles();
     if ( Math.abs(puckXVelocity) > 0.01 || Math.abs(puckYVelocity) > 0.01 ){
       movePuck();
     }
-  },20);
+  },1);
 
   setInterval(function(){
-    watchPaddle();
-  },100);
+    moveMallet();
+    watchMallet();
+  }, 60);
+
 };
+
+

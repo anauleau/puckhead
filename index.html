@@ -2,14 +2,14 @@
 <head>
   <title>puckhead</title>
   <link rel="stylesheet" href="style.css" />
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
+  <!-- <script src="/socket.io/socket.io.js"></script>
+     <script>
       var socket = io.connect('http://localhost');
       socket.on('news', function (data) {
         console.log(data);
         socket.emit('my other event', { my: 'data' });
       });
-    </script>
+    </script> -->
 </head>
 <body>
     <script src="raphael.js"></script>
@@ -27,6 +27,6 @@
           var htracker = new headtrackr.Tracker();
           htracker.init(videoInput, canvasInput);
           htracker.start();
-        </script>
-</body> -->
+        </script>  -->
+</body>
 </html>
