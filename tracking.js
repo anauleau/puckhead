@@ -122,13 +122,13 @@ window.onload = function() {
       }
   };
 
-  var detectCollisionsWithPaddles = function() {
+  var detectCollisionsWithMallets = function() {
     var xDiff = (puck.attrs.cx - mallet1.attr('cx'));
     var yDiff = (puck.attr('cy') - mallet1.attr('cy'));
     var xDiffSquared = Math.pow(xDiff, 2);
     var yDiffSquared = Math.pow(yDiff, 2);
     var distance = Math.sqrt(xDiffSquared + yDiffSquared);
-    if(distance < ((height/20) + (height/25))){
+    if(distance < (malletRadius + puckRadius)){
       puckXVelocity += malletXVelocity/60;
       puckYVelocity += malletYVelocity/60;
     }
@@ -138,7 +138,7 @@ window.onload = function() {
     if ( !detectCollisionsWithWalls() ){
       detectCollisionsWithGoalPosts();
     }
-    detectCollisionsWithPaddles();
+    detectCollisionsWithMallets();
     if ( Math.abs(puckXVelocity) > 0.01 || Math.abs(puckYVelocity) > 0.01 ){
       movePuck();
     }
