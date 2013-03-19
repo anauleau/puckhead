@@ -1,13 +1,33 @@
+//requirement declerations
 var app = require('express')(),
     server = require('http').createServer(app),
-    fs = require('fs'),
     io = require('socket.io').listen(server),
-    lobby = require('./lobby');
+    lobby = require('./lobby'),
+    user = require('./user'),
+    room =
 
 io.sockets.on('connection', function (socket) {
-  socket.on('my other event', function (data) {
-    console.log(data);
+
+  //instantiates new user on connection
+  var user = new User.User(socket);
+  lobby.rooms.waiting.push(user);
+
+  socket.on('assignNickname', function(){
+
   });
+
+  socket.on('newGame', function(user1, user2){
+
+  });
+
+  socket.on('gameEnd', function(user1, user2){
+
+  });
+
+  socket.on('sessionEnd', function(user1, user2){
+
+  });
+
 });
 
 server.listen(8080);
