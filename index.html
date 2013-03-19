@@ -17,7 +17,7 @@
           var videoInput = document.getElementById('inputVideo');
           var canvasInput = document.getElementById('inputCanvas');
 
-          var htracker = new headtrackr.Tracker();
+          var htracker = new headtrackr.Tracker({calcAngles : false});
           htracker.init(videoInput, canvasInput);
           htracker.start();
         </script>

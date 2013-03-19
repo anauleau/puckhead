@@ -1,7 +1,6 @@
 window.onload = function() {
-
-  var width = 1500;
-  var height = 750;
+  var width = 1000;
+  var height = 480;
 
   var paper = new Raphael(document.getElementById('canvas_container'), width, height);
 
@@ -36,8 +35,16 @@ window.onload = function() {
   var paddle1 = makePaddle(1);
   var paddle2 = makePaddle(2);
 
+  //find difference in position between this position and last position.
+  //make some kind of natural smoothing/animation from point to point.
+
+  var diff = function() {
+    diff = previousValue - newValue;
+  };
+
   document.addEventListener('facetrackingEvent', function (event) {
-    paddle1.animate({cx: event.x * 4, cy: event.y * 2}, 25);
+    console.log(event);
+    paddle1.animate({cx: event.x * 3 - 150, cy: event.y * 2}, 20);
   });
 
 };
