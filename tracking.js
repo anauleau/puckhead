@@ -31,8 +31,8 @@ window.onload = function() {
 
   // Draw puck and mallets.
 
-  var malletRadius = 5*sizeUnit;
-  var puckRadius = 3.5*sizeUnit;
+  var malletRadius = 10*sizeUnit;
+  var puckRadius = 6*sizeUnit;
 
   puck = paper.circle(width/2, height/2, puckRadius);
   puck.attr({fill: '#333'});
@@ -51,24 +51,26 @@ window.onload = function() {
   var mallet1 = makeMallet(1);
   var mallet2 = makeMallet(2);
 
-  var puckXVelocity = -45;
-  var puckYVelocity = 70;
+  var puckXVelocity = -sizeUnit;
+  var puckYVelocity = 4*sizeUnit;
 
   var malletXVelocity = 0;
   var malletYVelocity = 0;
   var oldMalletX = height/4;
   var oldMalletY = height/2;
 
+  var malletStepsFrequency = 100;
+
   var watchMallet = function(){
-    malletXVelocity =  mallet1.attrs.cx - oldMalletX;
-    malletYVelocity = mallet1.attrs.cy - oldMalletY; 
+    malletXVelocity =  (mallet1.attrs.cx - oldMalletX)/malletStepsFrequency;
+    malletYVelocity = (mallet1.attrs.cy - oldMalletY)/malletStepsFrequency; 
   };
 
   var moveMallet = function(){
     var xMinus = Math.random();
     var yMinus = Math.random();
-    malletXVelocity = Math.random() * 100;
-    malletYVelocity = Math.random() * 100;
+    malletXVelocity = Math.random() * 14 *sizeUnit;
+    malletYVelocity = Math.random() * 14 *sizeUnit;
     if ( (xMinus>0.5 || ((mallet1.attrs.cx + malletXVelocity)>width) ) && (mallet1.attrs.cx - malletXVelocity>0) ) {
       malletXVelocity = malletXVelocity*(-1);
     }
@@ -129,10 +131,29 @@ window.onload = function() {
     var yDiffSquared = Math.pow(yDiff, 2);
     var distance = Math.sqrt(xDiffSquared + yDiffSquared);
     if(distance < (malletRadius + puckRadius)){
-      puckXVelocity += malletXVelocity/60;
-      puckYVelocity += malletYVelocity/60;
+      // var malletVelocity = Math.sqrt( Math.pow(malletXVelocity,2) + Math.pow(malletYVelocity,2) );
+      // console.log('malletVelocity'+malletVelocity);
+      // var xDistance = puck.attrs.cx - mallet1.attrs.cx;
+      // var yDistance = puck.attrs.cy - mallet1.attrs.cy;
+      // var collisionAngle = Math.atan( yDistance/xDistance );
+      // console.log('deltaX'+(puck.attrs.cx - mallet1.attrs.cx));
+      // console.log('collisionAngle: '+collisionAngle);
+      // if ( xDistance )
+      // puckXVelocity += malletVelocity * Math.cos(collisionAngle);
+      // puckYVelocity += malletVelocity * Math.sin(collisionAngle);
+      if ( Math.abs(malletXVelocity) < Math.abs(puckXVelocity) && Math.abs(malletYVelocity) < Math.abs(puckYVelocity) ){
+        var vel = puckXVelocity;
+        var charr = (puckXVelocity/puckYVelocity) / Math.abs(puckXVelocity/puckYVelocity);
+        puckXVelocity = (-1) * puckYVelocity * charr;
+        puckYVelocity = (-1) * vel * charr;
+      } else {
+        puckXVelocity += malletXVelocity;
+        puckYVelocity += malletYVelocity;
+      }
     }
   };
+
+
 
   setInterval(function(){
     if ( !detectCollisionsWithWalls() ){
@@ -147,7 +168,7 @@ window.onload = function() {
   setInterval(function(){
     moveMallet();
     watchMallet();
-  }, 60);
+  }, malletStepsFrequency);
 
 };
 
