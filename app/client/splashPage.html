@@ -1,10 +1,19 @@
-<!-- This is the initial view. It briefly introduces the app. Upon choosing a name, the user is sent to lobbies.html, where he can choose a game to enter. -->
+<!-- This is the initial view. It briefly introduces the app and prompts the user to enter a nickname. Upon choosing a name, the user is sent to lobbies.html, where he can choose a game to enter. -->
 
 <html ng-app>
 
 <head>
 	<link rel="stylesheet" href="style.css" type="text/css"/>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script type="text/javascript" src="../vendor/angular.js"></script>
+	<script type="text/javascript" src="main.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+  <script>
+    var socket = io.connect('http://localhost');
+    socket.on('news', function (data) {
+    });
+  </script>
+
 	<title>Puckhead</title>
 </head>
 
@@ -13,8 +22,9 @@
 	<h2>Here is how it works:</h2>
 	<div id="introIllustration">An illustration explaining how the app works.</div>
 
-	<form>
-		<input placeholder="Enter your name and hit submit to continue" id="nameInput"><input type="submit" value="Submit">
+	<form name="getName">
+		<input placeholder="Enter your name and hit submit to continue" id="nameInput">
+		<input type="submit" value="Submit" id="submitName">
 	</form>
 
 </body>
