@@ -13,13 +13,14 @@ io.sockets.on('connection', function (socket) {
   var user = new User.Instance(socket);
   lobby.rooms.waiting.push(user);
 
-  socket.on('assignNickname', function(){
-
+  //calls the nickNamer function on assignName event
+  socket.on('assignName', function(socket, nickname){
+    User.nickNamer(socket, nickname);
   });
 
+  
   socket.on('newGame', function(user1, user2){
-
-  });
+   });
 
   socket.on('gameEnd', function(user1, user2){
 
