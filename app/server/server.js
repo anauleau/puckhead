@@ -1,32 +1,52 @@
-var app = require('express')(),
-    server = require('http').createServer(app),
-    io = require('socket.io').listen(server);
+//requirement declerations
+var express = require('express'),
+    app     = express(),
+    server  = require('http').createServer(app),
+    io      = require('socket.io').listen(server),
+    lobby   = require('./lobby'),
+    User    = require('./user'),
+    Room    = require('./room');
+
+io.sockets.on('connection', function (socket) {
+
+  //instantiates new user on connection
+  var user = new User.Instance(socket);
+  lobby.rooms.waiting.push(user);
+  console.log(lobby.rooms.waiting);
+
+  //calls the nickNamer function on assignName event
+  socket.on('assignName', function(socket, nickname){
+    User.nickNamer(socket, nickname);
+  });
+
+  //intantiates a new room on newGame event
+  socket.on('newGame', function(user1, user2){
+    var game = new Room.Instance(user1, user2);
+    lobby.rooms.active[game.roomID] = game;
+   });
+
+  socket.on('gameEnd', function(user1, user2, roomID){
+    lobby.rooms.waiting.push(user1, user2);    
+    lobby.rooms.active[roomID] = null;
+  });
+
+  socket.on('sessionEnd', function(user1, user2){
+    //res.end??
+  });
+
+});
 
 server.listen(8080);
 
-app.get('/', function (req, res) {
-  res.sendfile(__dirname + '/index.html');
-});
+//STATIC FILE SERVING CODE
+ // request -> "/"
+app.use(express.static(__dirname + '/../client'));
+app.use(express.static(__dirname + '/../styles'));
+app.use(express.static(__dirname + '/../vendor'));
 
-app.get('/raphael.js', function (req, res) {
-  res.sendfile(__dirname + '/raphael.js');
-});
-
-app.get('/tracking.js', function (req, res) {
-  res.sendfile(__dirname + '/tracking.js');
-});
-
-app.get('/headtrackr.js', function (req, res) {
-  res.sendfile(__dirname + '/headtrackr.js');
-});
-
-app.get('/style.css', function (req, res) {
-  res.sendfile(__dirname + '/style.css');
-});
-
-io.sockets.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function (data) {
-    console.log(data);
-  });
-});
+    //-> for client side:
+    //user1.wantstostart = true
+    //if user1.wantstostart && user2.wantstostart startgame()
+    // event that triggers user moving from waiting to room
+  //var user = lobby.rooms.waiting.shift();
+  //lobby.rooms.[uuid].push();
