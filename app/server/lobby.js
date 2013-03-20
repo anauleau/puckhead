@@ -1,12 +1,21 @@
-// defines User
-//socket refers to the object sent to the server upon initial request
+//game lobby
 
-//user should also have any identifying properties
-var Instance = function (socket) {
-  var user = {};
-  this.id = socket.id;
-  this.room = null;
-  this.nickname = undefined;
+var rooms = {
+  active:[],
+  waiting: []
 };
 
-module.exports.Instance = Instance;
+module.exports.rooms = rooms;
+
+/*
+PSEUDO PSEUDO CODE
+userActivate upon pinging the entry page
+  add to waiting []
+  prompt user for  nickname, save to user
+create a game instance with a players property
+  game instances stored in active []
+
+
+upon user exit call res.end --> kill connection
+
+*/
