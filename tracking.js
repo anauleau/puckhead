@@ -90,21 +90,51 @@ window.onload = function() {
   var mallet1 = makeMallet(1);
   var mallet2 = makeMallet(2);
 
-  bodyDef.type = b2Body.b2_kinematicBody;
-  fixDef.shape = new b2CircleShape;
-  fixDef.shape.SetRadius(malletRadius);
+  var malletFixDef = new b2FixtureDef;
+  malletFixDef.density = 100.0;
+  malletFixDef.friction = 0.0;
+  malletFixDef.restitution = 1.0;
+
+  bodyDef.type = b2Body.b2_dynamicBody;
+  malletFixDef.shape = new b2CircleShape;
+  malletFixDef.shape.SetRadius(malletRadius);
   bodyDef.position.Set(height/4, height/2);
   var mallet1Body = world.CreateBody(bodyDef);
-  mallet1Body.CreateFixture(fixDef);
+  mallet1Body.CreateFixture(malletFixDef);
   bodyDef.position.Set(width-height/4, height/2);
   var mallet2Body = world.CreateBody(bodyDef);
-  mallet2Body.CreateFixture(fixDef);
+  mallet2Body.CreateFixture(malletFixDef);
 
   // Drow marking.
   paper.path("M"+width/2+",0L"+width/2+","+height);
   paper.circle(gatesWidth, height/2, height/2);
   paper.circle(width-gatesWidth, height/2, height/2);
   paper.circle(width/2, height/2, height/5);
+
+  // Keyboard input.
+  var Key = {
+    _pressed: {},
+
+    A: 65,
+    W: 87,
+    D: 68,
+    S: 83,
+  
+    isDown: function(keyCode) {
+      return this._pressed[keyCode];
+    },
+  
+    onKeydown: function(event) {
+      console.log(event.keyCode);
+      this._pressed[event.keyCode] = true;
+    },
+  
+    onKeyup: function(event) {
+      delete this._pressed[event.keyCode];
+    }
+  };
+  window.addEventListener('keyup', function(event) { Key.onKeyup(event); }, false);
+  window.addEventListener('keydown', function(event) { Key.onKeydown(event); }, false);
 
   var draw = function() {
     var p = puckBody.GetPosition();
@@ -121,6 +151,19 @@ window.onload = function() {
   };
 
   var update = function() {
+    if (Key.isDown(Key.W)) {
+      mallet1Body.SetLinearVelocity(new b2Vec2(0, -5000));
+    }
+    if (Key.isDown(Key.S)) {
+      mallet1Body.SetLinearVelocity(new b2Vec2(0, 5000));
+    }
+    if (Key.isDown(Key.A)) {
+      mallet1Body.SetLinearVelocity(new b2Vec2(-5000, 0));
+    }
+    if (Key.isDown(Key.D)) {
+      mallet1Body.SetLinearVelocity(new b2Vec2(5000, 0));
+    }
+
     world.Step(1 / 60, 10, 10);
     world.ClearForces();
     draw();
