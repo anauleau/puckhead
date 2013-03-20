@@ -51,15 +51,15 @@ window.onload = function() {
   var mallet1 = makeMallet(1);
   var mallet2 = makeMallet(2);
 
-  var puckXVelocity = -sizeUnit;
-  var puckYVelocity = 4*sizeUnit;
+  var puckXVelocity = -2.5*sizeUnit;
+  var puckYVelocity = -0.4*sizeUnit;
 
   var malletXVelocity = 0;
   var malletYVelocity = 0;
   var oldMalletX = height/4;
   var oldMalletY = height/2;
 
-  var malletStepsFrequency = 100;
+  var malletStepsFrequency = 1;
 
   var watchMallet = function(){
     malletXVelocity =  (mallet1.attrs.cx - oldMalletX)/malletStepsFrequency;
@@ -69,8 +69,8 @@ window.onload = function() {
   var moveMallet = function(){
     var xMinus = Math.random();
     var yMinus = Math.random();
-    malletXVelocity = Math.random() * 14 *sizeUnit;
-    malletYVelocity = Math.random() * 14 *sizeUnit;
+    malletXVelocity = Math.random()*sizeUnit;
+    malletYVelocity = Math.random()*sizeUnit;
     if ( (xMinus>0.5 || ((mallet1.attrs.cx + malletXVelocity)>width) ) && (mallet1.attrs.cx - malletXVelocity>0) ) {
       malletXVelocity = malletXVelocity*(-1);
     }
@@ -115,47 +115,39 @@ window.onload = function() {
   };
 
   var detectCollisionsWithGoalPosts = function(){
-    if  ( ( (puckRadius >= puck.attrs.cx) && (puck.attrs.cx <= (puckRadius + gatesWidth) ) ) && (puck.attrs.cy <= gatesHeight+puckRadius) 
-          || ( (width-puckRadius-gatesWidth <= puck.attrs.cx && puck.attrs.cx <= width-puckRadius ) && (puck.attrs.cy <= gatesHeight+puckRadius) )
-          || ( (0+puckRadius <= puck.attrs.cx && puck.attrs.cx <= (puckRadius + gatesWidth)) && (puck.attrs.cy >= height-gatesHeight-puckRadius) ) 
+    if  ( ( (puckRadius <= puck.attrs.cx) && (puck.attrs.cx <= (puckRadius + gatesWidth) ) ) && (puck.attrs.cy <= gatesHeight+puckRadius) 
+          || ( (puckRadius <= puck.attrs.cx && puck.attrs.cx <= (puckRadius + gatesWidth)) && (puck.attrs.cy >= height-gatesHeight-puckRadius) ) 
+    ){
+      puck.attrs.cy = gatesHeight + puckRadius;
+      puckYVelocity = (-1)*puckYVelocity;
+    }
+    if ( ( (width-puckRadius-gatesWidth <= puck.attrs.cx && puck.attrs.cx <= width-puckRadius ) && (puck.attrs.cy <= gatesHeight+puckRadius) )
           || ( (width-puckRadius-gatesWidth <= puck.attrs.cx && puck.attrs.cx <= width-puckRadius ) && (puck.attrs.cy >= height-gatesHeight-puckRadius) )
-      ){
+    ){
+      puck.attrs.cy = height - gatesHeight - puckRadius;
       puckYVelocity = (-1)*puckYVelocity;
     }
   };
 
-  var detectCollisionsWithMallets = function() {
-    var xDiff = (puck.attrs.cx - mallet1.attr('cx'));
-    var yDiff = (puck.attr('cy') - mallet1.attr('cy'));
-    var xDiffSquared = Math.pow(xDiff, 2);
-    var yDiffSquared = Math.pow(yDiff, 2);
-    var distance = Math.sqrt(xDiffSquared + yDiffSquared);
-    if(distance < (malletRadius + puckRadius)){
-      // var malletVelocity = Math.sqrt( Math.pow(malletXVelocity,2) + Math.pow(malletYVelocity,2) );
-      // console.log('malletVelocity'+malletVelocity);
-      // var xDistance = puck.attrs.cx - mallet1.attrs.cx;
-      // var yDistance = puck.attrs.cy - mallet1.attrs.cy;
-      // var collisionAngle = Math.atan( yDistance/xDistance );
-      // console.log('deltaX'+(puck.attrs.cx - mallet1.attrs.cx));
-      // console.log('collisionAngle: '+collisionAngle);
-      // if ( xDistance )
-      // puckXVelocity += malletVelocity * Math.cos(collisionAngle);
-      // puckYVelocity += malletVelocity * Math.sin(collisionAngle);
-      if ( Math.abs(malletXVelocity) < Math.abs(puckXVelocity) && Math.abs(malletYVelocity) < Math.abs(puckYVelocity) ){
-        var vel = puckXVelocity;
-        var charr = (puckXVelocity/puckYVelocity) / Math.abs(puckXVelocity/puckYVelocity);
-        puckXVelocity = (-1) * puckYVelocity * charr;
-        puckYVelocity = (-1) * vel * charr;
-      } else {
-        var vel = puckXVelocity;
-        var charr = (puckXVelocity/puckYVelocity) / Math.abs(puckXVelocity/puckYVelocity);
-        puckXVelocity = (-1) * puckYVelocity * charr + malletXVelocity;
-        puckYVelocity = (-1) * vel * charr + malletYVelocity;
-      }
-    }
+  var vectorLen = function(x, y) {
+    return Math.sqrt(x*x + y*y);
   };
 
-
+  var detectCollisionsWithMallets = function() {
+    var xDiff = (puck.attr('cx') - mallet1.attr('cx'));
+    var yDiff = (puck.attr('cy') - mallet1.attr('cy'));
+    var distance = vectorLen(xDiff, yDiff);
+    if(distance <= (malletRadius + puckRadius)){
+      var normalX = xDiff / distance
+      var normalY = yDiff / distance
+      var dotProduct = normalX*puckXVelocity + normalY*puckYVelocity;
+      var doubleX = -2*dotProduct*normalX;
+      var doubleY = -2*dotProduct*normalY;
+      var malletVelocity = vectorLen(malletXVelocity, malletYVelocity);
+      puckXVelocity += doubleX + normalX*malletVelocity;
+      puckYVelocity += doubleY + normalY*malletVelocity;
+    }
+  };
 
   setInterval(function(){
     if ( !detectCollisionsWithWalls() ){
@@ -168,7 +160,7 @@ window.onload = function() {
   },1);
 
   setInterval(function(){
-    moveMallet();
+    //moveMallet();
     watchMallet();
   }, malletStepsFrequency);
 
