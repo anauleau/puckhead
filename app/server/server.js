@@ -1,11 +1,11 @@
 //requirement declerations
 var express = require('express'),
-    app = express(),
-    server = require('http').createServer(app),
-    io = require('socket.io').listen(server),
-    lobby = require('./lobby'),
-    User = require('./user'),
-    Room = require('./room');
+    app     = express(),
+    server  = require('http').createServer(app),
+    io      = require('socket.io').listen(server),
+    lobby   = require('./lobby'),
+    User    = require('./user'),
+    Room    = require('./room');
 
 io.sockets.on('connection', function (socket) {
 
@@ -18,16 +18,19 @@ io.sockets.on('connection', function (socket) {
     User.nickNamer(socket, nickname);
   });
 
-  
+  //intantiates a new room on newGame event
   socket.on('newGame', function(user1, user2){
+    var game = new Room.Instance(user1, user2);
+    lobby.rooms.active[game.roomID] = game;
    });
 
-  socket.on('gameEnd', function(user1, user2){
-
+  socket.on('gameEnd', function(user1, user2, roomID){
+    lobby.rooms.waiting.push(user1, user2);    
+    lobby.rooms.active[roomID] = null;
   });
 
   socket.on('sessionEnd', function(user1, user2){
-
+    //res.end??
   });
 
 });
@@ -39,3 +42,10 @@ server.listen(8080);
 app.use(express.static(__dirname + '/../client'));
 app.use(express.static(__dirname + '/../styles'));
 app.use(express.static(__dirname + '/../vendor'));
+
+    //-> for client side:
+    //user1.wantstostart = true
+    //if user1.wantstostart && user2.wantstostart startgame()
+    // event that triggers user moving from waiting to room
+  //var user = lobby.rooms.waiting.shift();
+  //lobby.rooms.[uuid].push();

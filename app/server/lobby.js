@@ -1,8 +1,8 @@
 //game lobby
 
 var rooms = {
-  active:[],
-  waiting: []
+  active  :{},
+  waiting :[]
 };
 
 module.exports.rooms = rooms;
