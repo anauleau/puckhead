@@ -1,4 +1,4 @@
-//defines room or gameBoard
+//defines room
 var lobby = require('./lobby'),
     uuid  = require('node-uuid');
 

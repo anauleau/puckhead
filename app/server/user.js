@@ -1,5 +1,6 @@
-/* defines User and related functions, the socket refers 
-to the object sent to the server upon initial request */
+//defines User and related functions
+
+// possibley add nameTest
 
 var Instance = function (socket) {
   var user = {};

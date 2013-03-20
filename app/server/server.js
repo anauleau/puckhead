@@ -25,13 +25,10 @@ io.sockets.on('connection', function (socket) {
     lobby.rooms.active[game.roomID] = game;
    });
 
+  //handles gameEnd event
   socket.on('gameEnd', function(user1, user2, roomID){
     lobby.rooms.waiting.push(user1, user2);    
     lobby.rooms.active[roomID] = null;
-  });
-
-  socket.on('sessionEnd', function(user1, user2){
-    //res.end??
   });
 
 });
