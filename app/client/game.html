@@ -1,0 +1,21 @@
+<!-- This page displays the game board. On finishing a game, the user is brought to the post-game view, at postgame.html. -->
+<html ng-app>
+
+<head>
+	<link rel="stylesheet" href="style.css" type="text/css"/>
+	<script type="text/javascript" src="../vendor/angular.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+  <script>
+    var socket = io.connect('http://localhost');
+    socket.on('news', function (data) {
+    });
+  </script>
+	<title>Puckhead</title>
+</head>
+
+<body>
+	<h1>To play, you need to allow webcam access. Click "allow webcam access" at the top right.</h1>
+	<div id="gameBoard"></div>
+</body>
+
+</html>
