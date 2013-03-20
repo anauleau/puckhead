@@ -4,7 +4,6 @@ to the object sent to the server upon initial request */
 var Instance = function (socket) {
   var user = {};
   this.id = socket.id;
-  this.room = null;
   this.nickname = undefined;
 };
 
