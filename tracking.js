@@ -1,7 +1,5 @@
 window.onload = function() {
-
-  // Define a board dimensions and draw the board.
-
+  // Define dimensions of objects.
   if ( window.innerWidth > window.innerHeight*2 ){
     var width = window.innerHeight*2;
     var height = window.innerHeight;
@@ -9,34 +7,76 @@ window.onload = function() {
     var width = window.innerWidth;
     var height = window.innerWidth/2;
   }
-
   var sizeUnit = height/100;
-
-  var paper = new Raphael(document.getElementById('canvas_container'), width, height);
-
-  // Drow gates and marking.
-
+  var puckRadius = 6*sizeUnit;
+  var puckX = width/2;
+  var puckY = height/2;
+  var malletRadius = 10*sizeUnit;
   var gatesWidth = 5*sizeUnit;
   var gatesHeight = 33*sizeUnit;
 
-  paper.path("M"+width/2+",0L"+width/2+","+height);
+  // Define a board dimensions and draw the board.
+  var paper = new Raphael(document.getElementById('canvas_container'), width, height);
+
+  // Box2D.
+  var b2World = Box2D.Dynamics.b2World,
+      b2Vec2 = Box2D.Common.Math.b2Vec2,
+      b2BodyDef = Box2D.Dynamics.b2BodyDef,
+      b2Body = Box2D.Dynamics.b2Body,
+      b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape,
+      b2CircleShape = Box2D.Collision.Shapes.b2CircleShape,
+      b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
+      b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
+
+  var world = new b2World(new b2Vec2(0, 0), true);
+
+  var fixDef = new b2FixtureDef;
+  fixDef.density = 1.0;
+  fixDef.friction = 0.0;
+  fixDef.restitution = 1.0;
+
+  var bodyDef = new b2BodyDef;
+
+  // Create walls.
+  bodyDef.type = b2Body.b2_staticBody;
+  fixDef.shape = new b2PolygonShape;
+  fixDef.shape.SetAsBox(width, 2);
+  bodyDef.position.Set(0, -2);
+  world.CreateBody(bodyDef).CreateFixture(fixDef);
+  bodyDef.position.Set(0, height);
+  world.CreateBody(bodyDef).CreateFixture(fixDef);
+
+  // Create gates.
   paper.rect(0, 0, gatesWidth, gatesHeight).attr({fill:'#999'});
   paper.rect(0, height-gatesHeight, gatesWidth, gatesHeight).attr({fill:'#999'});
   paper.rect(width-gatesWidth, 0, gatesWidth, gatesHeight).attr({fill:'#999'});
   paper.rect(width-gatesWidth, height-gatesHeight, gatesWidth, gatesHeight).attr({fill:'#999'});
 
-  paper.circle(gatesWidth, height/2, height/2);
-  paper.circle(width-gatesWidth, height/2, height/2);
-  paper.circle(width/2, height/2, height/5);
+  bodyDef.type = b2Body.b2_staticBody;
+  fixDef.shape = new b2PolygonShape;
+  fixDef.shape.SetAsBox(gatesWidth, gatesHeight);
+  bodyDef.position.Set(0, 0);
+  world.CreateBody(bodyDef).CreateFixture(fixDef);
+  bodyDef.position.Set(0, height);
+  world.CreateBody(bodyDef).CreateFixture(fixDef);
+  bodyDef.position.Set(width, 0);
+  world.CreateBody(bodyDef).CreateFixture(fixDef);
+  bodyDef.position.Set(width, height);
+  world.CreateBody(bodyDef).CreateFixture(fixDef);
 
-  // Draw puck and mallets.
-
-  var malletRadius = 10*sizeUnit;
-  var puckRadius = 6*sizeUnit;
-
+  // Create the puck.
   puck = paper.circle(width/2, height/2, puckRadius);
   puck.attr({fill: '#333'});
 
+  bodyDef.type = b2Body.b2_dynamicBody;
+  fixDef.shape = new b2CircleShape;
+  fixDef.shape.SetRadius(puckRadius);
+  bodyDef.position.Set(puckX, puckY);
+  var puckBody = world.CreateBody(bodyDef);
+  puckBody.CreateFixture(fixDef);
+  puckBody.SetLinearVelocity(new b2Vec2(5000, 6000));  // Temp.
+
+  // Create the mallets.
   var makeMallet = function(player) {
     if (player === 1) {
       var mallet = paper.circle(height/4, height/2, malletRadius);
@@ -47,123 +87,44 @@ window.onload = function() {
     }
     return mallet;
   };
-
   var mallet1 = makeMallet(1);
   var mallet2 = makeMallet(2);
 
-  var puckXVelocity = -2.5*sizeUnit;
-  var puckYVelocity = -0.4*sizeUnit;
+  bodyDef.type = b2Body.b2_kinematicBody;
+  fixDef.shape = new b2CircleShape;
+  fixDef.shape.SetRadius(malletRadius);
+  bodyDef.position.Set(height/4, height/2);
+  var mallet1Body = world.CreateBody(bodyDef);
+  mallet1Body.CreateFixture(fixDef);
+  bodyDef.position.Set(width-height/4, height/2);
+  var mallet2Body = world.CreateBody(bodyDef);
+  mallet2Body.CreateFixture(fixDef);
 
-  var malletXVelocity = 0;
-  var malletYVelocity = 0;
-  var oldMalletX = height/4;
-  var oldMalletY = height/2;
+  // Drow marking.
+  paper.path("M"+width/2+",0L"+width/2+","+height);
+  paper.circle(gatesWidth, height/2, height/2);
+  paper.circle(width-gatesWidth, height/2, height/2);
+  paper.circle(width/2, height/2, height/5);
 
-  var malletStepsFrequency = 1;
+  var draw = function() {
+    var p = puckBody.GetPosition();
+    puck.attr('cx', p.x);
+    puck.attr('cy', p.y);
 
-  var watchMallet = function(){
-    malletXVelocity =  (mallet1.attrs.cx - oldMalletX)/malletStepsFrequency;
-    malletYVelocity = (mallet1.attrs.cy - oldMalletY)/malletStepsFrequency; 
+    p = mallet1Body.GetPosition();
+    mallet1.attr('cx', p.x);
+    mallet1.attr('cy', p.y);
+
+    p = mallet2Body.GetPosition();
+    mallet2.attr('cx', p.x);
+    mallet2.attr('cy', p.y);
   };
 
-  var moveMallet = function(){
-    var xMinus = Math.random();
-    var yMinus = Math.random();
-    malletXVelocity = Math.random()*sizeUnit;
-    malletYVelocity = Math.random()*sizeUnit;
-    if ( (xMinus>0.5 || ((mallet1.attrs.cx + malletXVelocity)>width) ) && (mallet1.attrs.cx - malletXVelocity>0) ) {
-      malletXVelocity = malletXVelocity*(-1);
-    }
-    if ( (yMinus>0.5 || ((mallet1.attrs.cy + malletYVelocity)>height) ) && (mallet1.attrs.cy - malletYVelocity>0) ){
-      malletYVelocity = malletYVelocity*(-1);
-    }
-    mallet1.attr('cx', mallet1.attrs.cx + malletXVelocity );
-    mallet1.attr('cy', mallet1.attrs.cy + malletYVelocity );
+  var update = function() {
+    world.Step(1 / 60, 10, 10);
+    world.ClearForces();
+    draw();
   };
 
-  var movePuck = function(){
-    puck.attr('cx', puck.attrs.cx + puckXVelocity );
-    puck.attr('cy', puck.attrs.cy + puckYVelocity );
-    // console.log('x: '+puck.attrs.cx+', y: '+puck.attrs.cy);
-    puckXVelocity *= 0.99;
-    puckYVelocity *= 0.99;
-  };
-
-  var detectCollisionsWithWalls = function (){
-    var collision = false;
-    if ( (puck.attrs.cx <= (puckRadius + gatesWidth)) && (puck.attrs.cy <= gatesHeight || puck.attrs.cy >= height-gatesHeight ) ) {
-      collision = true;
-      puck.attrs.cx = puckRadius + gatesWidth;
-      puckXVelocity = (-1)*puckXVelocity;
-    }
-    if ( (puck.attrs.cx >= (width - puckRadius - gatesWidth)) && (puck.attrs.cy <= gatesHeight || puck.attrs.cy >= height-gatesHeight ) ) {
-      collision = true;
-      puck.attrs.cx = width - puckRadius - gatesWidth;
-      puckXVelocity = (-1)*puckXVelocity;
-    }
-    if (puck.attrs.cy <= puckRadius+2){
-      collision = true;
-      puck.attrs.cy = puckRadius;
-      puckYVelocity = (-1)*puckYVelocity;
-    }
-    if (puck.attrs.cy >= height-puckRadius){
-      collision = true;
-      puck.attrs.cy = height - puckRadius;
-      puckYVelocity = (-1)*puckYVelocity;
-    }
-    return collision;
-  };
-
-  var detectCollisionsWithGoalPosts = function(){
-    if  ( ( (puckRadius <= puck.attrs.cx) && (puck.attrs.cx <= (puckRadius + gatesWidth) ) ) && (puck.attrs.cy <= gatesHeight+puckRadius) 
-          || ( (puckRadius <= puck.attrs.cx && puck.attrs.cx <= (puckRadius + gatesWidth)) && (puck.attrs.cy >= height-gatesHeight-puckRadius) ) 
-    ){
-      puck.attrs.cy = gatesHeight + puckRadius;
-      puckYVelocity = (-1)*puckYVelocity;
-    }
-    if ( ( (width-puckRadius-gatesWidth <= puck.attrs.cx && puck.attrs.cx <= width-puckRadius ) && (puck.attrs.cy <= gatesHeight+puckRadius) )
-          || ( (width-puckRadius-gatesWidth <= puck.attrs.cx && puck.attrs.cx <= width-puckRadius ) && (puck.attrs.cy >= height-gatesHeight-puckRadius) )
-    ){
-      puck.attrs.cy = height - gatesHeight - puckRadius;
-      puckYVelocity = (-1)*puckYVelocity;
-    }
-  };
-
-  var vectorLen = function(x, y) {
-    return Math.sqrt(x*x + y*y);
-  };
-
-  var detectCollisionsWithMallets = function() {
-    var xDiff = (puck.attr('cx') - mallet1.attr('cx'));
-    var yDiff = (puck.attr('cy') - mallet1.attr('cy'));
-    var distance = vectorLen(xDiff, yDiff);
-    if(distance <= (malletRadius + puckRadius)){
-      var normalX = xDiff / distance
-      var normalY = yDiff / distance
-      var dotProduct = normalX*puckXVelocity + normalY*puckYVelocity;
-      var doubleX = -2*dotProduct*normalX;
-      var doubleY = -2*dotProduct*normalY;
-      var malletVelocity = vectorLen(malletXVelocity, malletYVelocity);
-      puckXVelocity += doubleX + normalX*malletVelocity;
-      puckYVelocity += doubleY + normalY*malletVelocity;
-    }
-  };
-
-  setInterval(function(){
-    if ( !detectCollisionsWithWalls() ){
-      detectCollisionsWithGoalPosts();
-    }
-    detectCollisionsWithMallets();
-    if ( Math.abs(puckXVelocity) > 0.01 || Math.abs(puckYVelocity) > 0.01 ){
-      movePuck();
-    }
-  },1);
-
-  setInterval(function(){
-    //moveMallet();
-    watchMallet();
-  }, malletStepsFrequency);
-
+  window.setInterval(update, 1000 / 60);
 };
-
-
