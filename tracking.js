@@ -63,6 +63,12 @@ window.onload = function() {
   world.CreateBody(bodyDef).CreateFixture(fixDef);
   bodyDef.position.Set(width, height);
   world.CreateBody(bodyDef).CreateFixture(fixDef);
+  
+  // Drow marking.
+  paper.path("M"+width/2+",0L"+width/2+","+height);
+  paper.circle(gatesWidth, height/2, height/2);
+  paper.circle(width-gatesWidth, height/2, height/2);
+  paper.circle(width/2, height/2, height/5);
 
   // Create the puck.
   puck = paper.circle(width/2, height/2, puckRadius);
@@ -105,11 +111,6 @@ window.onload = function() {
   var mallet2Body = world.CreateBody(bodyDef);
   mallet2Body.CreateFixture(malletFixDef);
 
-  // Drow marking.
-  paper.path("M"+width/2+",0L"+width/2+","+height);
-  paper.circle(gatesWidth, height/2, height/2);
-  paper.circle(width-gatesWidth, height/2, height/2);
-  paper.circle(width/2, height/2, height/5);
 
   // Keyboard input.
   var Key = {
