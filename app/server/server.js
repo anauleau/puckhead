@@ -5,7 +5,8 @@ var express = require('express'),
     io      = require('socket.io').listen(server),
     lobby   = require('./lobby'),
     User    = require('./user'),
-    Room    = require('./room');
+    Room    = require('./room'),
+    router  = require('./router');
 
 io.sockets.on('connection', function (socket) {
 
@@ -36,10 +37,12 @@ io.sockets.on('connection', function (socket) {
 server.listen(8080);
 
 //STATIC FILE SERVING CODE
- // request -> "/"
 app.use(express.static(__dirname + '/../client'));
 app.use(express.static(__dirname + '/../styles'));
 app.use(express.static(__dirname + '/../vendor'));
+
+module.exports.app = app;
+
 
     //-> for client side:
     //user1.wantstostart = true
@@ -47,3 +50,5 @@ app.use(express.static(__dirname + '/../vendor'));
     // event that triggers user moving from waiting to room
   //var user = lobby.rooms.waiting.shift();
   //lobby.rooms.[uuid].push();
+
+
