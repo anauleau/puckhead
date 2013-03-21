@@ -4,4 +4,8 @@ body {
 svg { 
 	border: 1px solid black; 
 	margin: 0 auto;
+	background: url(subtlenet2.png);
+}
+.leftMallet {
+	box-shadow: 0 0 50px 15px black;
 }
