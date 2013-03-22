@@ -2,15 +2,13 @@
 
 // possibley add nameTest
 
-var Instance = function (socket) {
-  var user = {};
+function User(socket){
   this.id = socket.id;
   this.nickname = undefined;
-};
+}
 
-var nickNamer = function (socket, nickname) {
+User.prototype.setNickname = function(nickname){
   this.nickname = nickname;
-};
+}
 
-module.exports.Instance = Instance;
-module.exports.nickNamer = nickNamer;
+module.exports = User;

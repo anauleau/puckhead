@@ -5,19 +5,20 @@ var express = require('express'),
     io      = require('socket.io').listen(server),
     lobby   = require('./lobby'),
     User    = require('./user'),
-    Room    = require('./room'),
-    router  = require('./router');
+    Room    = require('./room');
 
-io.sockets.on('connection', function (socket) {
+io.sockets.on('connection', function(socket) {
 
   //instantiates new user on connection
-  var user = new User.Instance(socket);
-  lobby.rooms.waiting.push(user);
+  var user = new User(socket);
+  lobby.rooms.waiting[socket.id] = user;
+  console.log(user);
   console.log(lobby.rooms.waiting);
 
   //calls the nickNamer function on assignName event
-  socket.on('assignName', function(socket, nickname){
-    User.nickNamer(socket, nickname);
+  socket.on('assignName', function(socket, nickname) {
+    var user = lobby.rooms.waiting[socket.id];
+    user.setNickname(nickname);
   });
 
   //intantiates a new room on newGame event
@@ -27,7 +28,7 @@ io.sockets.on('connection', function (socket) {
    });
 
   //handles gameEnd event
-  socket.on('gameEnd', function(user1, user2, roomID){
+  socket.on('gameEnd', function(user1, user2, roomID) {
     lobby.rooms.waiting.push(user1, user2);    
     lobby.rooms.active[roomID] = null;
   });
@@ -37,18 +38,7 @@ io.sockets.on('connection', function (socket) {
 server.listen(8080);
 
 //STATIC FILE SERVING CODE
+
 app.use(express.static(__dirname + '/../client'));
 app.use(express.static(__dirname + '/../styles'));
 app.use(express.static(__dirname + '/../vendor'));
-
-module.exports.app = app;
-
-
-    //-> for client side:
-    //user1.wantstostart = true
-    //if user1.wantstostart && user2.wantstostart startgame()
-    // event that triggers user moving from waiting to room
-  //var user = lobby.rooms.waiting.shift();
-  //lobby.rooms.[uuid].push();
-
-
