@@ -9,6 +9,7 @@ window.onload = function() {
   var malletRadius = 10*sizeUnit;
   var gatesWidth = 5*sizeUnit;
   var gatesHeight = 33*sizeUnit;
+  var worldCoeff = 0.01;  // Try scaling the world by this factor.
 
   // Define a board dimensions and draw the board.
   var paper = new Raphael(document.getElementById('canvas_container'), width, height);
@@ -42,10 +43,10 @@ window.onload = function() {
   world.CreateBody(bodyDef).CreateFixture(fixDef);
 
   // Create gates.
-  paper.rect(0, 0, gatesWidth, gatesHeight).attr({fill:'#999'});
-  paper.rect(0, height-gatesHeight, gatesWidth, gatesHeight).attr({fill:'#999'});
-  paper.rect(width-gatesWidth, 0, gatesWidth, gatesHeight).attr({fill:'#999'});
-  paper.rect(width-gatesWidth, height-gatesHeight, gatesWidth, gatesHeight).attr({fill:'#999'});
+  paper.rect(0, 0, gatesWidth, gatesHeight).attr({stroke: '#000', 'stroke-width': 2, fill:"180-#222:10-#555:20-#333"});
+  paper.rect(0, height-gatesHeight, gatesWidth, gatesHeight).attr({stroke: '#000', 'stroke-width': 2, fill:"180-#222:10-#555:20-#333"});
+  paper.rect(width-gatesWidth, 0, gatesWidth, gatesHeight).attr({stroke: '#000', 'stroke-width': 2, fill:"0-#222:10-#555:20-#333"});
+  paper.rect(width-gatesWidth, height-gatesHeight, gatesWidth, gatesHeight).attr({stroke: '#000', 'stroke-width': 2, fill:"0-#222:10-#555:20-#333"});
 
   bodyDef.type = b2Body.b2_staticBody;
   fixDef.shape = new b2PolygonShape;
@@ -59,9 +60,15 @@ window.onload = function() {
   bodyDef.position.Set(width, height);
   world.CreateBody(bodyDef).CreateFixture(fixDef);
 
+  // Drow marking.
+  paper.path("M"+width/2+",0L"+width/2+","+height);
+  paper.circle(gatesWidth, height/2, height/2);
+  paper.circle(width-gatesWidth, height/2, height/2);
+  paper.circle(width/2, height/2, height/5);
+
   // Create the puck.
   puck = paper.circle(width/2, height/2, puckRadius);
-  puck.attr({fill: '#333'});
+  puck.attr({fill: "r(.5,.5)#555-#333:40#222:80-#333:90-#000"});
 
   bodyDef.type = b2Body.b2_dynamicBody;
   fixDef.shape = new b2CircleShape;
@@ -75,10 +82,10 @@ window.onload = function() {
   var makeMallet = function(player) {
     if (player === 1) {
       var mallet = paper.circle(height/4, height/2, malletRadius);
-      mallet.attr({fill: '#F00'});
+      mallet.attr({stroke: "#500", fill: "r(.5,.5)#f00-#600:45-#200:50-#300:60-#200:68-#200:70-#c00:85-#600"});
     } else {
       var mallet = paper.circle(width-height/4, height/2, malletRadius);
-      mallet.attr({fill: '#00F'});
+      mallet.attr({stroke: "#005", fill: "r(.5,.5)#00f-#006:45-#002:50-#003:60-#002:68-#002:70-#00c:85-#006"});
     }
     return mallet;
   };
@@ -107,6 +114,7 @@ window.onload = function() {
   paper.circle(width-gatesWidth, height/2, height/2);
   paper.circle(width/2, height/2, height/5);
 
+
   var draw = function() {
     var p = puckBody.GetPosition();
     puck.attr('cx', p.x);
@@ -134,6 +142,7 @@ window.onload = function() {
     mallet1.attr.cy = tempY;
 
     mallet1Body.SetLinearVelocity(new b2Vec2((xDiff / 60) * 200, (yDiff / 60) * 200));
+
 
     world.Step(1 / 60, 10, 10);
     world.ClearForces();
