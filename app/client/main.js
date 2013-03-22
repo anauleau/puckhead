@@ -3,6 +3,6 @@ $(document).ready(function () {
 	//event for the server to pick up, so that the server can set the nickname of the user.
 	$('#submitName').click(function(){
 		var nameToSend = $('#nameInput').val();
-		socket.emit('assignName', {name: nameToSend});
+		socket.emit('assignName', nameToSend);
 	});
 });

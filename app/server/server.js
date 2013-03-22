@@ -12,11 +12,10 @@ io.sockets.on('connection', function(socket) {
   //instantiates new user on connection
   var user = new User(socket);
   lobby.rooms.waiting[socket.id] = user;
-  console.log(user);
-  console.log(lobby.rooms.waiting);
+
 
   //calls the nickNamer function on assignName event
-  socket.on('assignName', function(socket, nickname) {
+  socket.on('assignName', function(nickname) {
     var user = lobby.rooms.waiting[socket.id];
     user.setNickname(nickname);
   });
