@@ -1,8 +1,8 @@
 body {
 	margin: 0px;
 }
-svg { 
-	border: 1px solid black; 
+svg {
+	border: 1px solid black;
 	margin: 0 auto;
 	background: url(subtlenet2.png);
 }
@@ -16,9 +16,25 @@ video {
   -ms-transform: scaleX(-1);
   transform : scaleX(-1);
   display: block;
-  margin: 0 auto;
+  margin: 40px auto;
+  position: absolute;
+  left: 450px;
 }
 .contain {
   width: 960px;
-  margin: 0 auto;
+  margin: 40px auto;
+}
+.overlay {
+  width: 120px;
+  height: 120px;
+  z-index: 100;
+  background: green;
+  position: absolute;
+  border: 2px solid red;
+  left: 540px;
+  top: 160px;
+  opacity: 0.25;
+}
+#canvas_container {
+  margin-top: 360px;
 }
