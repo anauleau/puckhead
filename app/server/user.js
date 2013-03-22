@@ -1,15 +1,14 @@
-/* defines User and related functions, the socket refers 
-to the object sent to the server upon initial request */
+//defines User and related functions
 
-var Instance = function (socket) {
-  var user = {};
+// possibley add nameTest
+
+function User(socket){
   this.id = socket.id;
   this.nickname = undefined;
-};
+}
 
-var nickNamer = function (socket, nickname) {
+User.prototype.setNickname = function(nickname){
   this.nickname = nickname;
-};
+}
 
-module.exports.Instance = Instance;
-module.exports.nickNamer = nickNamer;
+module.exports = User;
