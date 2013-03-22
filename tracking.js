@@ -1,12 +1,7 @@
 window.onload = function() {
   // Define dimensions of objects.
-  if ( window.innerWidth > window.innerHeight*2 ){
-    var width = window.innerHeight*2;
-    var height = window.innerHeight;
-  } else {
-    var width = window.innerWidth;
-    var height = window.innerWidth/2;
-  }
+  var width  = 960;
+  var height = 480;
   var sizeUnit = height/100;
   var puckRadius = 6*sizeUnit;
   var puckX = width/2;
@@ -87,6 +82,7 @@ window.onload = function() {
     }
     return mallet;
   };
+
   var mallet1 = makeMallet(1);
   var mallet2 = makeMallet(2);
 
@@ -105,36 +101,11 @@ window.onload = function() {
   var mallet2Body = world.CreateBody(bodyDef);
   mallet2Body.CreateFixture(malletFixDef);
 
-  // Drow marking.
+  // Draw marking.
   paper.path("M"+width/2+",0L"+width/2+","+height);
   paper.circle(gatesWidth, height/2, height/2);
   paper.circle(width-gatesWidth, height/2, height/2);
   paper.circle(width/2, height/2, height/5);
-
-  // Keyboard input.
-  var Key = {
-    _pressed: {},
-
-    A: 65,
-    W: 87,
-    D: 68,
-    S: 83,
-  
-    isDown: function(keyCode) {
-      return this._pressed[keyCode];
-    },
-  
-    onKeydown: function(event) {
-      console.log(event.keyCode);
-      this._pressed[event.keyCode] = true;
-    },
-  
-    onKeyup: function(event) {
-      delete this._pressed[event.keyCode];
-    }
-  };
-  window.addEventListener('keyup', function(event) { Key.onKeyup(event); }, false);
-  window.addEventListener('keydown', function(event) { Key.onKeydown(event); }, false);
 
   var draw = function() {
     var p = puckBody.GetPosition();
@@ -150,24 +121,32 @@ window.onload = function() {
     mallet2.attr('cy', p.y);
   };
 
+  var nextX;
+  var nextY;
+
   var update = function() {
-    if (Key.isDown(Key.W)) {
-      mallet1Body.SetLinearVelocity(new b2Vec2(0, -5000));
-    }
-    if (Key.isDown(Key.S)) {
-      mallet1Body.SetLinearVelocity(new b2Vec2(0, 5000));
-    }
-    if (Key.isDown(Key.A)) {
-      mallet1Body.SetLinearVelocity(new b2Vec2(-5000, 0));
-    }
-    if (Key.isDown(Key.D)) {
-      mallet1Body.SetLinearVelocity(new b2Vec2(5000, 0));
-    }
+
+    var tempX = nextX;
+    var tempY = nextY;
+    var xDiff = nextX - mallet1.attrs.cx;
+    var yDiff = nextY - mallet1.attrs.cy;
+    mallet1.attrs.cx = tempX;
+    mallet1.attr.cy = tempY;
+
+    mallet1Body.SetLinearVelocity(new b2Vec2((xDiff / 60) * 200, (yDiff / 60) * 200));
 
     world.Step(1 / 60, 10, 10);
     world.ClearForces();
     draw();
   };
 
-  window.setInterval(update, 1000 / 60);
+  document.addEventListener('facetrackingEvent', function (event) {
+      nextX = (320 - event.x) * 3 - 200;
+      nextY = (event.y) * 2 + 20;
+   });
+
+  window.ready = function() {
+    window.setInterval(update, 1000 / 60);
+  }
+
 };

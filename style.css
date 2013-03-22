@@ -5,3 +5,16 @@ svg {
 	border: 1px solid black; 
 	margin: 0 auto;
 }
+video {
+  -o-transform : scaleX(-1);
+  -moz-transform : scaleX(-1);
+  -webkit-transform : scaleX(-1);
+  -ms-transform: scaleX(-1);
+  transform : scaleX(-1);
+  display: block;
+  margin: 0 auto;
+}
+.contain {
+  width: 960px;
+  margin: 0 auto;
+}
