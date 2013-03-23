@@ -28,6 +28,11 @@ var server = http.createServer(function (request, response) {
       if (err) throw err;
       response.end(data);
     });
+  } else if (request.url === '/Box2dWeb-2.1.a.3.min.js') {
+    fs.readFile('Box2dWeb-2.1.a.3.min.js', function (err, data) {
+      if (err) throw err;
+      response.end(data);
+    });
   }
 });
 
