@@ -1,3 +1,5 @@
+<!-- Here, the player will choose who he wants to play with. First, he will be prompted to choose someone to play with. This prompt will appear in the bigMessage div. Once he has chosen an opponent, that prompt will be replaced with one telling him where to put his head. Once he has positioned his head correctly, the prompt will finally be replaced with one telling him to click on that div to play. Then, he will go to the game view, game.html. -->
+
 <html>
 
 <head>
@@ -14,8 +16,15 @@
 </head>
 
 <body>
-	<h1 id="webcam">To play, you need to allow webcam access. Click "allow webcam access" at the top right.</h1>
-	<h2>Choose a person to play against.</h2>
+	<div id="bigMessage"><h2>Choose a person to play against.</h2></div>
+	<ul id ="playerList">
+		<li>Coleman</li>
+		<li>Tatiana</li>
+		<li>Howard</li>
+		<li>Andreas</li>
+	</ul>
+	<div id="mainContainer"></div>
+
 </body>
 
 </html>
