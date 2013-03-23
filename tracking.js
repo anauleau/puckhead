@@ -41,10 +41,10 @@ window.onload = function() {
   // Create walls.
   bodyDef.type = b2Body.b2_staticBody;
   fixDef.shape = new b2PolygonShape;
-  fixDef.shape.SetAsBox(width, 2);
-  bodyDef.position.Set(0, -2);
+  fixDef.shape.SetAsBox(width*worldCoeff, 2*worldCoeff);
+  bodyDef.position.Set(0, -2*worldCoeff);
   world.CreateBody(bodyDef).CreateFixture(fixDef);
-  bodyDef.position.Set(0, height);
+  bodyDef.position.Set(0, height*worldCoeff);
   world.CreateBody(bodyDef).CreateFixture(fixDef);
 
   // Create gates.
@@ -55,14 +55,14 @@ window.onload = function() {
 
   bodyDef.type = b2Body.b2_staticBody;
   fixDef.shape = new b2PolygonShape;
-  fixDef.shape.SetAsBox(gatesWidth, gatesHeight);
+  fixDef.shape.SetAsBox(gatesWidth*worldCoeff, gatesHeight*worldCoeff);
   bodyDef.position.Set(0, 0);
   world.CreateBody(bodyDef).CreateFixture(fixDef);
-  bodyDef.position.Set(0, height);
+  bodyDef.position.Set(0, height*worldCoeff);
   world.CreateBody(bodyDef).CreateFixture(fixDef);
-  bodyDef.position.Set(width, 0);
+  bodyDef.position.Set(width*worldCoeff, 0);
   world.CreateBody(bodyDef).CreateFixture(fixDef);
-  bodyDef.position.Set(width, height);
+  bodyDef.position.Set(width*worldCoeff, height*worldCoeff);
   world.CreateBody(bodyDef).CreateFixture(fixDef);
 
   // Drow marking.
@@ -77,11 +77,11 @@ window.onload = function() {
 
   bodyDef.type = b2Body.b2_dynamicBody;
   fixDef.shape = new b2CircleShape;
-  fixDef.shape.SetRadius(puckRadius);
-  bodyDef.position.Set(puckX, puckY);
+  fixDef.shape.SetRadius(puckRadius*worldCoeff);
+  bodyDef.position.Set(puckX*worldCoeff, puckY*worldCoeff);
   var puckBody = world.CreateBody(bodyDef);
   puckBody.CreateFixture(fixDef);
-  puckBody.SetLinearVelocity(new b2Vec2(5000, 6000));  // Temp.
+  puckBody.SetLinearVelocity(new b2Vec2(5, 6));  // Temp.
 
   // Create the mallets.
   var makeMallet = function(player) {
@@ -104,11 +104,11 @@ window.onload = function() {
 
   bodyDef.type = b2Body.b2_dynamicBody;
   malletFixDef.shape = new b2CircleShape;
-  malletFixDef.shape.SetRadius(malletRadius);
-  bodyDef.position.Set(height/4, height/2);
+  malletFixDef.shape.SetRadius(malletRadius*worldCoeff);
+  bodyDef.position.Set(height/4*worldCoeff, height/2*worldCoeff);
   var mallet1Body = world.CreateBody(bodyDef);
   mallet1Body.CreateFixture(malletFixDef);
-  bodyDef.position.Set(width-height/4, height/2);
+  bodyDef.position.Set((width-height/4)*worldCoeff, height/2*worldCoeff);
   var mallet2Body = world.CreateBody(bodyDef);
   mallet2Body.CreateFixture(malletFixDef);
 
@@ -140,30 +140,30 @@ window.onload = function() {
 
   var draw = function() {
     var p = puckBody.GetPosition();
-    puck.attr('cx', p.x);
-    puck.attr('cy', p.y);
+    puck.attr('cx', p.x/worldCoeff);
+    puck.attr('cy', p.y/worldCoeff);
 
     p = mallet1Body.GetPosition();
-    mallet1.attr('cx', p.x);
-    mallet1.attr('cy', p.y);
+    mallet1.attr('cx', p.x/worldCoeff);
+    mallet1.attr('cy', p.y/worldCoeff);
 
     p = mallet2Body.GetPosition();
-    mallet2.attr('cx', p.x);
-    mallet2.attr('cy', p.y);
+    mallet2.attr('cx', p.x/worldCoeff);
+    mallet2.attr('cy', p.y/worldCoeff);
   };
 
   var update = function() {
     if (Key.isDown(Key.W)) {
-      mallet1Body.SetLinearVelocity(new b2Vec2(0, -5000));
+      mallet1Body.SetLinearVelocity(new b2Vec2(0, -5));
     }
     if (Key.isDown(Key.S)) {
-      mallet1Body.SetLinearVelocity(new b2Vec2(0, 5000));
+      mallet1Body.SetLinearVelocity(new b2Vec2(0, 5));
     }
     if (Key.isDown(Key.A)) {
-      mallet1Body.SetLinearVelocity(new b2Vec2(-5000, 0));
+      mallet1Body.SetLinearVelocity(new b2Vec2(-5, 0));
     }
     if (Key.isDown(Key.D)) {
-      mallet1Body.SetLinearVelocity(new b2Vec2(5000, 0));
+      mallet1Body.SetLinearVelocity(new b2Vec2(5, 0));
     }
     puckBody.SetLinearVelocity(new b2Vec2 (puckBody.GetLinearVelocity().x * 0.997, puckBody.GetLinearVelocity().y * 0.997) );
 
