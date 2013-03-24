@@ -1,4 +1,7 @@
 window.onload = function() {
+
+  var gameIsOver = false;
+
   // Define dimensions of objects.
   var width  = 960;
   var height = 480;
@@ -65,6 +68,12 @@ window.onload = function() {
   paper.circle(gatesWidth, height / 2, height / 2);
   paper.circle(width - gatesWidth, height / 2, height / 2);
   paper.circle(width / 2, height / 2, height / 5);
+
+  var score1 = paper.text(width / 2 - 4 * sizeUnit, 6 * sizeUnit, 0);
+  var score2 = paper.text(width / 2 + 4 * sizeUnit, 6 * sizeUnit, 0);
+  score1.attr({"font-size":40, fill:"red"});
+  score2.attr({"font-size":40, fill:"blue"});
+  
 
   // Create the puck.
   puck = paper.circle(width / 2, height / 2, puckRadius);
@@ -151,16 +160,42 @@ window.onload = function() {
     }
   };
 
-  var update = function() {
-    if (player === 1) {
-      updateMallet(nextX, nextY, mallet1);
-    } else {
-      updateMallet(nextX2, nextY2, mallet2);
+  var updateScore = function(){
+    if ( puck.attr('cx') < gatesWidth ){
+      var sc2 = Number( score2.attr('text') );
+      if ( sc2 >= 5 ){
+        var message = paper.text(width / 2 - 10 * sizeUnit, 20 * sizeUnit, 'You won!');
+        message.attr("font-size", 60);
+        gameIsOver = true;
+      } else {
+        score2.attr('text', sc2+1);
+      }
+    } 
+    if ( puck.attr('cx') > width-gatesWidth ) {
+      var sc1 = Number( score1.attr('text') );
+      if ( sc1 >= 5 ){
+        var message = paper.text(width / 2 - 10 * sizeUnit, 20 * sizeUnit, 'You lost!');
+        message.attr("font-size", 60);
+        gameIsOver = true;
+      } else {
+        score1.attr('text', sc1+1);
+      }
     }
+  };
 
-    world.Step(1 / 60, 10, 10);
-    world.ClearForces();
-    draw();
+  var update = function() {
+    if (!gameIsOver){
+      if (player === 1) {
+        updateMallet(nextX, nextY, mallet1);
+      } else {
+        updateMallet(nextX2, nextY2, mallet2);
+      }
+
+      updateScore();
+      world.Step(1 / 60, 10, 10);
+      world.ClearForces();
+      draw();
+    } 
   };
 
   document.addEventListener('facetrackingEvent', function (event) {
