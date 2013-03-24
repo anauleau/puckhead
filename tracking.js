@@ -137,12 +137,11 @@ window.onload = function() {
 
   //takes new x and y, moves the mallet toward that position at all times.
   var updateMallet = function(x, y, mallet) {
-    var tempX = x;
-    var tempY = y;
     var xDiff = x - mallet.attrs.cx;
     var yDiff = y - mallet.attrs.cy;
-    mallet.attrs.cx = tempX;
-    mallet.attr.cy = tempY;
+    mallet.attrs.cx = x;
+    mallet.attr.cy = y;
+    socket.emit('move', {x: x, y: y});
 
     if (mallet === mallet1) {
       mallet1Body.SetLinearVelocity(new b2Vec2((xDiff / 60) * 7, (yDiff / 60) * 7));
@@ -165,10 +164,10 @@ window.onload = function() {
 
   document.addEventListener('facetrackingEvent', function (event) {
       if (player === 1) {
-        nextX = (320 - event.x) * 3 - 200;
+        nextX = (320 - event.x) * 3 - 300;
         nextY = (event.y) * 2;
       } else {
-        nextX2 = (320 - event.x) * 3 + 200;
+        nextX2 = (320 - event.x) * 3 + 300;
         nextY2 = (event.y) * 2;
       }
    });
