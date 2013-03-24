@@ -2,31 +2,37 @@
 <head>
   <title>puckhead</title>
   <link rel="stylesheet" href="style.css" />
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-      var socket = io.connect('http://localhost');
-      socket.on('news', function (data) {
-        console.log(data);
-        socket.emit('my other event', { my: 'data' });
-      });
-    </script>
+  <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
     <script src="raphael.js"></script>
     <script src="headtrackr.js"></script>
     <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="Box2dWeb-2.1.a.3.min.js"></script>
     <script src="tracking.js"></script>
-    <div id="canvas_container">
-  </div>
-    <canvas id="inputCanvas" width="320" height="240" style="display:none"></canvas>
-    <video id="inputVideo" autoplay loop></video>
-        <script type="text/javascript">
-          var videoInput = document.getElementById('inputVideo');
-          var canvasInput = document.getElementById('inputCanvas');
 
-          var htracker = new headtrackr.Tracker();
-          htracker.init(videoInput, canvasInput);
-          htracker.start();
-        </script>
+    <div class="contain">
+      <input type="button" class="ready" value="ready up"/>
+      <canvas id="inputCanvas" width="320" height="240" style="display:none"></canvas>
+      <video id="inputVideo" autoplay loop></video>
+      <div class="overlay"/></div>
+      <div id="canvas_container">
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      var socket = io.connect('http://localhost');
+      socket.on('news', function (data) {
+        console.log(data);
+        socket.emit('my other event', { my: 'data' });
+      });
+
+      var videoInput = document.getElementById('inputVideo');
+      var canvasInput = document.getElementById('inputCanvas');
+
+      var htracker = new headtrackr.Tracker();
+      htracker.init(videoInput, canvasInput);
+      htracker.start();
+    </script>
 </body>
 </html>
