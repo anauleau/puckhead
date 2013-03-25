@@ -1,4 +1,7 @@
 //game lobby
 
-var active  = [],
-    waiting = [];
+var rooms = {
+  active: {}
+};
+
+module.exports.rooms = rooms;
