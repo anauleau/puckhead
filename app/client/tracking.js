@@ -196,7 +196,6 @@ window.onload = function() {
   $('.ready').click(function (e) {
     $('.overlay').remove();
     socket.emit('playerReady', {player: player});
-    ready();
   });
 
   socket.on('e', function(data) {
@@ -205,10 +204,13 @@ window.onload = function() {
     otherPlayer = data.player;
   });
 
-//when bothready
   window.ready = function() {
     window.setInterval(update, 1000 / 60);
   };
+
+  socket.on('bothPlayersReady', function(data){
+    ready();
+  });
 
 };
 
@@ -216,13 +218,14 @@ window.onload = function() {
 // problemlist:
 
 // priority.
-// how do we choose which player is which???
-// syncing game start for both players
-// major separation of client drawing and server physics
+// how do we choose which player is which??? (coleman)
+
+// major separation of client drawing and server physics (tatiana)
 // syncing state (physics on server, client renders results)
 // scoring system (resetting board)
 // ending games (first to 3 wins, boot from game)
 
+// handling singles
 // waiting system, display template if in waiting room. (link to room)
 // latency (fk)
 // private games

@@ -23,6 +23,15 @@ io.sockets.on('connection', function (socket) {
   users[socket.id] = new User(socket);
   var user = users[socket.id];
 
+   socket.on('hi', function(data) {
+    var thisUser = users[socket.id];
+    setTimeout(function(){
+          thisUser.emit('hello', {room: thisUser.room});
+        }, 0)
+
+    console.log(users);
+  });
+
 //conditional to deal with new users
   //case one - new user joins existing room
   if (lobby.rooms.waiting) {
@@ -51,23 +60,21 @@ io.sockets.on('connection', function (socket) {
     lobby.rooms.waiting = room;
   }
 
-  socket.on('hi', function(data) {
-    var thisUser = users[socket.id];
-    setTimeout(function(){
-          thisUser.emit('hello', {room: thisUser.room});
-        }, 0)
-
-    console.log(users);
+  socket.on('playerReady', function(data){
+    var thisRoom = lobby.rooms.active[user.room];
+    thisRoom.readyPlayers.push(data.player);
+    if (thisRoom.readyPlayers.length === 2) {
+      user.emit('bothPlayersReady');
+      users[user.other].emit('bothPlayersReady');
+    };
   });
 
   socket.on('ping', function(data) {
-    var thisUser = users[socket.id];
-    users[thisUser.other].emit('hello', data);
+    users[user.other].emit('hello', data);
   })
 
   socket.on('move', function (data) {
-    var thisUser = users[socket.id];
-      users[thisUser.other].emit('e', data);
+      users[user.other].emit('e', data);
   });
 
   //handles disconnects and subsequently deletes the user
