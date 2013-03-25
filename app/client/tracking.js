@@ -76,7 +76,7 @@ window.onload = function() {
   bodyDef.position.Set(puckX*worldCoeff, puckY*worldCoeff);
   var puckBody = world.CreateBody(bodyDef);
   puckBody.CreateFixture(fixDef);
-  puckBody.SetLinearVelocity(new b2Vec2(5, 6));  // Temp.
+  puckBody.SetLinearVelocity(new b2Vec2(1, 6));  // Temp.
 
   // Create the mallets.
   var makeMallet = function(player) {
@@ -87,12 +87,13 @@ window.onload = function() {
       var mallet = paper.circle(width - height / 4, height / 2, malletRadius);
       mallet.attr({stroke: "#005", fill: "r(.5,.5)#00f-#006:45-#002:50-#003:60-#002:68-#002:70-#00c:85-#006"});
     }
+
     return mallet;
   };
 
   var mallet1 = makeMallet(1);
   var mallet2 = makeMallet(2);
-  var otherPlayer;
+  var otherPlayer; // (this.room.user.otherplayer;)
 
   var malletFixDef = new b2FixtureDef;
   malletFixDef.density = 100.0;
@@ -134,7 +135,7 @@ window.onload = function() {
   var nextY;
   var nextX2;
   var nextY2;
-  var player = parseInt(prompt('1 or 2?'));
+  var player = parseInt(prompt('1 or 2?')); //if (room.player1 === this.user.id) else
 
   //takes new x and y, moves the mallet toward that position at all times.
   var updateMallet = function(x, y, mallet) {
@@ -171,16 +172,22 @@ window.onload = function() {
       updateMallet(nextX, nextY, mallet2);
     }
 
+    if (otherPlayer && otherPlayer === 1) {
+      updateOtherMallet(otherX, otherY, mallet1);
+    } else if (otherPlayer && otherPlayer === 2) {
+      updateOtherMallet(otherX, otherY, mallet2);
+    }
+
     world.Step(1 / 60, 10, 10);
     world.ClearForces();
     draw();
   };
 
   document.addEventListener('facetrackingEvent', function (event) {
-      if (player === 1) {
+      if (player === 1 && ((320 - event.x) * 3 - 300) < 480) {
         nextX = (320 - event.x) * 3 - 300;
         nextY = (event.y) * 2;
-      } else {
+      } else if (player === 2 && ((320 - event.x) * 3 + 300) > 480) {
         nextX = (320 - event.x) * 3 + 300;
         nextY = (event.y) * 2;
       }
@@ -196,12 +203,6 @@ window.onload = function() {
     otherX = data.x;
     otherY = data.y;
     otherPlayer = data.player;
-
-    if (otherPlayer === 1) {
-      updateOtherMallet(otherX, otherY, mallet1);
-    } else {
-      updateOtherMallet(otherX, otherY, mallet2);
-    }
   });
 
 //when bothready
@@ -210,3 +211,20 @@ window.onload = function() {
   };
 
 };
+
+
+// problemlist:
+
+// priority.
+// how do we choose which player is which???
+// syncing game start for both players
+// major separation of client drawing and server physics
+// syncing state (physics on server, client renders results)
+// scoring system (resetting board)
+// ending games (first to 3 wins, boot from game)
+
+// waiting system, display template if in waiting room. (link to room)
+// latency (fk)
+// private games
+// redesign board
+// implement splash

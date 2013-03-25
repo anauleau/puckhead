@@ -23,7 +23,13 @@
     <script type="text/javascript">
       var socket = io.connect('http://10.0.1.11:8080');
 
-      socket.emit('hi', {1: '1'});
+      var ping = function() {
+        socket.emit('ping', {ping: 'pong'});
+      };
+
+      socket.on('hello', function(data) {
+        console.log(data);
+      })
 
       var videoInput = document.getElementById('inputVideo');
       var canvasInput = document.getElementById('inputCanvas');
@@ -31,6 +37,7 @@
       var htracker = new headtrackr.Tracker();
       htracker.init(videoInput, canvasInput);
       htracker.start();
+            socket.emit('hi');
     </script>
 </body>
 </html>
