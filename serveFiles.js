@@ -36,4 +36,17 @@ var server = http.createServer(function (request, response) {
   }
 });
 
+
+
 server.listen(8000);
+
+var io = require('socket.io').listen(server);
+
+//game positions
+io.sockets.on('connection', function (socket) {
+  socket.emit('news', { hello: 'world' });
+  socket.on('move', function (data) {
+    console.log('yo', data)
+  });
+});
+
