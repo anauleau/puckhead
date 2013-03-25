@@ -1,4 +1,3 @@
-
 //naive server
 
 var express = require('express'),
@@ -24,58 +23,65 @@ io.sockets.on('connection', function (socket) {
   users[socket.id] = new User(socket);
   var user = users[socket.id];
 
+   socket.on('hi', function(data) {
+    var thisUser = users[socket.id];
+    setTimeout(function(){
+          thisUser.emit('hello', {room: thisUser.room});
+        }, 0)
+
+    console.log(users);
+  });
+
 //conditional to deal with new users
   //case one - new user joins existing room
-  if(lobby.rooms.waiting){
+  if (lobby.rooms.waiting) {
     var room = lobby.rooms.waiting;
     room.user2 = user;
+    console.log('this is user1', room.user2.id);
     lobby.rooms.active[room.roomID] = room;
-    lobby.rooms.waiting = undefined;
 
     //assign each room's user with a room property
-    room.user1.room   = room;
-    room.user2.room   = room;
+    room.user1.room   = room.roomID;
+    room.user2.room   = room.roomID;
 
     //assign each room's user an 'other' property to identify other room's user
-    room.user1.other  = room.user2;
-    room.user2.other  = room.user1;
+    room.user1.other  = room.user2.id;
+    room.user2.other  = room.user1.id;
+
+
+    //sets waitng to undefined
+    lobby.rooms.waiting = undefined;
 
   //case two - else new room created for user, they are waiting
   } else {
     var room = new Room();
     room.user1 = user;
+    room.user1.room = room.roomID;
     lobby.rooms.waiting = room;
   }
 
-  socket.on('hi', function(data){
-    var user = users[socket.id];
-    var room = user.room;
-    console.log('user object', users);
-    user.other.socket.send('sent');
+  socket.on('playerReady', function(data){
+    var thisRoom = lobby.rooms.active[user.room];
+    thisRoom.readyPlayers.push(data.player);
+    if (thisRoom.readyPlayers.length === 2) {
+      user.emit('bothPlayersReady');
+      users[user.other].emit('bothPlayersReady');
+    };
   });
 
-  socket.on('gameFull', function (data) {
+  socket.on('ping', function(data) {
+    users[user.other].emit('hello', data);
+  })
 
+  socket.on('move', function (data) {
+      users[user.other].emit('e', data);
   });
 
   //handles disconnects and subsequently deletes the user
   socket.on('disconnect', function(){
     delete users[socket];
     io.sockets.emit('user disconnected');
-  })
-
-  io.sockets.on('connection', function (socket) {
-
-  socket.join('room');
-
-  socket.on('playerReady', function(data) {
-    //once both players ready, then emit bothready
   });
-
-  socket.on('move', function (data) {
-    socket.broadcast.to('room').emit('e', data);
-  });
-});
 });
 
 app.use(express.static(__dirname + '/../client'));

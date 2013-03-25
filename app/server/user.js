@@ -4,6 +4,7 @@
 
 function User(socket){
   this.socket = socket;
+  this.id = socket.id;
   this.nickname = undefined;
 }
 

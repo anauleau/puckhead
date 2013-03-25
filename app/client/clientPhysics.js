@@ -1,5 +1,7 @@
 window.onload = function() {
 
+  var worldCreated = false;
+
   // Define dimensions of objects.
   var width  = 960;
   var height = 480;
@@ -121,6 +123,9 @@ window.onload = function() {
     paper.circle(gatesWidth, height / 2, height / 2);
     paper.circle(width - gatesWidth, height / 2, height / 2);
     paper.circle(width / 2, height / 2, height / 5);
+
+    worldCreated = true;
+    console.log('world created');
 
   };
 

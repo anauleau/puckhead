@@ -4,6 +4,7 @@ var lobby = require('./lobby'),
 
 function Room(){
   this.roomID = uuid.v1();
+  this.readyPlayers = [];
 }
 
 module.exports = Room;
