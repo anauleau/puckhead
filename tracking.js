@@ -92,6 +92,7 @@ window.onload = function() {
 
   var mallet1 = makeMallet(1);
   var mallet2 = makeMallet(2);
+  var otherPlayer;
 
   var malletFixDef = new b2FixtureDef;
   malletFixDef.density = 100.0;
@@ -114,7 +115,7 @@ window.onload = function() {
   paper.circle(width - gatesWidth, height / 2, height / 2);
   paper.circle(width / 2, height / 2, height / 5);
 
-
+  //soon draw by x and y determined by server
   var draw = function() {
     var p = puckBody.GetPosition();
     puck.attr('cx', p.x/worldCoeff);
@@ -133,7 +134,7 @@ window.onload = function() {
   var nextY;
   var nextX2;
   var nextY2;
-  var player = 1;
+  var player = parseInt(prompt('1 or 2?'));
 
   //takes new x and y, moves the mallet toward that position at all times.
   var updateMallet = function(x, y, mallet) {
@@ -141,7 +142,20 @@ window.onload = function() {
     var yDiff = y - mallet.attrs.cy;
     mallet.attrs.cx = x;
     mallet.attr.cy = y;
-    socket.emit('move', {x: x, y: y});
+    socket.emit('move', {x: x, y: y, player: player});
+
+    if (mallet === mallet1) {
+      mallet1Body.SetLinearVelocity(new b2Vec2((xDiff / 60) * 7, (yDiff / 60) * 7));
+    } else {
+      mallet2Body.SetLinearVelocity(new b2Vec2((xDiff / 60) * 7, (yDiff / 60) * 7));
+    }
+  };
+
+  var updateOtherMallet = function(x, y, mallet) {
+      var xDiff = x - mallet.attrs.cx;
+      var yDiff = y - mallet.attrs.cy;
+      mallet.attrs.cx = x;
+      mallet.attr.cy = y;
 
     if (mallet === mallet1) {
       mallet1Body.SetLinearVelocity(new b2Vec2((xDiff / 60) * 7, (yDiff / 60) * 7));
@@ -154,7 +168,7 @@ window.onload = function() {
     if (player === 1) {
       updateMallet(nextX, nextY, mallet1);
     } else {
-      updateMallet(nextX2, nextY2, mallet2);
+      updateMallet(nextX, nextY, mallet2);
     }
 
     world.Step(1 / 60, 10, 10);
@@ -167,16 +181,30 @@ window.onload = function() {
         nextX = (320 - event.x) * 3 - 300;
         nextY = (event.y) * 2;
       } else {
-        nextX2 = (320 - event.x) * 3 + 300;
-        nextY2 = (event.y) * 2;
+        nextX = (320 - event.x) * 3 + 300;
+        nextY = (event.y) * 2;
       }
    });
 
   $('.ready').click(function (e) {
     $('.overlay').remove();
+    socket.emit('playerReady', {player: player});
     ready();
   });
 
+  socket.on('e', function(data) {
+    otherX = data.x;
+    otherY = data.y;
+    otherPlayer = data.player;
+
+    if (otherPlayer === 1) {
+      updateOtherMallet(otherX, otherY, mallet1);
+    } else {
+      updateOtherMallet(otherX, otherY, mallet2);
+    }
+  });
+
+//when bothready
   window.ready = function() {
     window.setInterval(update, 1000 / 60);
   };
