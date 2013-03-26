@@ -79,22 +79,20 @@ var createWorld = function(callback){
   mallet2Body = world.CreateBody(bodyDef);
   mallet2Body.CreateFixture(malletFixDef);
 
-  console.log('------------world created---------------------');
   callback();
 
 };
 
 //takes new x and y, moves the mallet toward that position at all times.
 exports.updateMallet = function( malletData ) {
-  console.log('---------in updateMallet------------');
   if ( malletData.player === 1 ){
-    var mallet1YDiff = malletData.y * worldCoeff - mallet1Body.GetPosition().y;
-    var mallet1XDiff = malletData.x * worldCoeff - mallet1Body.GetPosition().x;
+    var mallet1YDiff = (malletData.y * worldCoeff) - mallet1Body.GetPosition().y;
+    var mallet1XDiff = (malletData.x * worldCoeff) - mallet1Body.GetPosition().x;
     mallet1Body.SetLinearVelocity(new b2Vec2((mallet1XDiff / 60) * 70, (mallet1YDiff / 60) * 70));
   } else {
-    var mallet2XDiff = malletData.x * worldCoeff - mallet2Body.GetPosition().x;
-    var mallet2YDiff = malletData.y * worldCoeff - mallet2Body.GetPosition().y;
-    mallet2Body.SetLinearVelocity(new b2Vec2((mallet2XDiff / 60) * 7, (mallet2YDiff / 60) * 7));
+    var mallet2XDiff = (malletData.x * worldCoeff) - mallet2Body.GetPosition().x;
+    var mallet2YDiff = (malletData.y * worldCoeff) - mallet2Body.GetPosition().y;
+    mallet2Body.SetLinearVelocity(new b2Vec2((mallet2XDiff / 60) * 70, (mallet2YDiff / 60) * 70));
   }
 };
 

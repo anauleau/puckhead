@@ -58,14 +58,11 @@ window.onload = function() {
     paper.circle(width - gatesWidth, height / 2, height / 2);
     paper.circle(width / 2, height / 2, height / 5);
 
-    console.log('world created');
-
   };
 
   drawWorld();
 
-  var updateBoard = function( worldState ){
-    console.log('in updateWorld');
+  var updateBoard = function(worldState) {
     puck.attr('cx', worldState.puckX);
     puck.attr('cy', worldState.puckY);
     mallet1.attr('cx', worldState.mallet1X);
@@ -77,8 +74,7 @@ window.onload = function() {
   };
 
   socket.on('positionsUpdated', function(data){
-    console.log('in positionUpdated');
+    console.log(data);
     updateBoard(data);
   });
-
 };
