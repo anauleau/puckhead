@@ -9,7 +9,7 @@
     <script src="headtrackr.js"></script>
     <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
     <script src="Box2dWeb-2.1.a.3.min.js"></script>
-    <script src="tracking.js"></script>
+    <script src="clientPhysics.js"></script>
 
     <div class="contain">
       <input type="button" class="ready" value="ready up"/>
@@ -21,7 +21,7 @@
     </div>
 
     <script type="text/javascript">
-      var socket = io.connect('http://10.0.1.11:8080');
+      var socket = io.connect('http://localhost');
 
       var ping = function() {
         socket.emit('ping', {ping: 'pong'});
@@ -29,7 +29,7 @@
 
       socket.on('hello', function(data) {
         console.log(data);
-      })
+      });
 
       var videoInput = document.getElementById('inputVideo');
       var canvasInput = document.getElementById('inputCanvas');
@@ -38,6 +38,37 @@
       htracker.init(videoInput, canvasInput);
       htracker.start();
       socket.emit('hi');
+
+      var player = parseInt(prompt('1 or 2?'));
+      console.log(player);
+
+
+      $('.ready').click(function (e) {
+
+        console.log('button');
+        $('.overlay').remove();
+        socket.emit('playerReady', {player: player});
+        console.log('after emit playerReady')
+
+        document.addEventListener('facetrackingEvent', function (event) {
+          console.log('facetracking event');
+          var position = {};
+          if (player === 1) {
+            position.player = 1;
+            position.x = (320 - event.x) * 3 - 300;
+            position.y = (event.y) * 2;
+          } else {
+            position.player = 2;
+            position.x = (320 - event.x) * 3 + 300;
+            position.y = (event.y) * 2;
+          }
+          console.log(position);
+          socket.emit('move', position);
+        });
+
+      });
+
+
     </script>
 </body>
 </html>

@@ -164,7 +164,7 @@ window.onload = function() {
       mallet.attr.cy = y;
 
     if (mallet === mallet1) {
-      mallet1Body.SetLinearVelocity(new b2Vec2((xDiff / 60) * 7, (yDiff / 60) * 7));
+      mallet1Body.SetLinearVelocity(new b2Vec2((xDiff) * 7, (yDiff) * 7));
     } else {
       mallet2Body.SetLinearVelocity(new b2Vec2((xDiff / 60) * 7, (yDiff / 60) * 7));
     }

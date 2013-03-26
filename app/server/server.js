@@ -9,6 +9,7 @@ var express = require('express'),
     Room    = require('./room'),
     path    = require('path'),
     uuid    = require('node-uuid');
+    physics = require('./serverPhysics');
     users   = {};
 
 server.listen(8080);
@@ -22,8 +23,11 @@ io.sockets.on('connection', function (socket) {
   //create new user on connection - gives user socket property
   users[socket.id] = new User(socket);
   var user = users[socket.id];
+  console.log('++++++++++++++');
+  console.log(socket.id);
+  console.log(user);
 
-   socket.on('hi', function(data) {
+  socket.on('hi', function(data) {
     var thisUser = users[socket.id];
     setTimeout(function(){
           thisUser.emit('hello', {room: thisUser.room});
@@ -34,39 +38,63 @@ io.sockets.on('connection', function (socket) {
 
 //conditional to deal with new users
   //case one - new user joins existing room
-  if (lobby.rooms.waiting) {
-    var room = lobby.rooms.waiting;
-    room.user2 = user;
-    console.log('this is user1', room.user2.id);
-    lobby.rooms.active[room.roomID] = room;
+  // if (lobby.rooms.waiting) {
+  //   var room = lobby.rooms.waiting;
+  //   room.user2 = user;
+  //   console.log('this is user1', room.user2.id);
+  //   lobby.rooms.active[room.roomID] = room;
 
-    //assign each room's user with a room property
-    room.user1.room   = room.roomID;
-    room.user2.room   = room.roomID;
+  //   //assign each room's user with a room property
+  //   room.user1.room   = room.roomID;
+  //   room.user2.room   = room.roomID;
 
-    //assign each room's user an 'other' property to identify other room's user
-    room.user1.other  = room.user2.id;
-    room.user2.other  = room.user1.id;
+  //   //assign each room's user an 'other' property to identify other room's user
+  //   room.user1.other  = room.user2.id;
+  //   room.user2.other  = room.user1.id;
 
 
-    //sets waitng to undefined
-    lobby.rooms.waiting = undefined;
+  //   //sets waitng to undefined
+  //   lobby.rooms.waiting = undefined;
 
-  //case two - else new room created for user, they are waiting
-  } else {
-    var room = new Room();
-    room.user1 = user;
-    room.user1.room = room.roomID;
-    lobby.rooms.waiting = room;
-  }
+  // //case two - else new room created for user, they are waiting
+  // } else {
+  //   var room = new Room();
+  //   room.user1 = user;
+  //   room.user1.room = room.roomID;
+  //   lobby.rooms.waiting = room;
+  // }
+
+  // socket.on('playerReady', function(data){
+  //   console.log('============= on playerReady');
+  //   var thisRoom = lobby.rooms.active[user.room];
+  //   console.log(lobby);
+  //   console.log(lobby.rooms);
+  //   console.log(lobby.rooms.active);
+  //   console.log(lobby.rooms.active[user.room]);
+  //   console.log(user.room);
+  //   thisRoom.readyPlayers.push(data.player);
+  //   if (thisRoom.readyPlayers.length === 2) {
+  //     physics.createWorld(function(){
+  //       physics.start();
+  //       setInterval(function(){
+  //         var worldState = physics.watchWorldState();
+  //         socket.emit('positionsUpdated', worldState);
+  //       }, 100);
+  //     });
+  //   };
+  // });
 
   socket.on('playerReady', function(data){
-    var thisRoom = lobby.rooms.active[user.room];
-    thisRoom.readyPlayers.push(data.player);
-    if (thisRoom.readyPlayers.length === 2) {
-      user.emit('bothPlayersReady');
-      users[user.other].emit('bothPlayersReady');
-    };
+    physics.createWorld(function(){
+      console.log('in createWorld success ########');
+      physics.start();
+      setInterval(function(){
+        console.log('in interval -------------');
+        var worldState = physics.watchWorldState();
+        console.log(worldState);
+        socket.emit('positionsUpdated', worldState); 
+      }, 5);
+    });
   });
 
   socket.on('ping', function(data) {
@@ -74,9 +102,10 @@ io.sockets.on('connection', function (socket) {
   })
 
   socket.on('move', function (data) {
-      users[user.other].emit('e', data);
-  });
-
+    console.log('on move ========================>');
+    console.log(data);
+    physics.updateMallet(data);
+    });
   //handles disconnects and subsequently deletes the user
   socket.on('disconnect', function(){
     delete users[socket];
