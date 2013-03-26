@@ -62,19 +62,38 @@ window.onload = function() {
 
   drawWorld();
 
-  var updateBoard = function(worldState) {
+var updateBoard = function( worldState ){
+    console.log('in updateWorld');
     puck.attr('cx', worldState.puckX);
     puck.attr('cy', worldState.puckY);
     mallet1.attr('cx', worldState.mallet1X);
     mallet1.attr('cy', worldState.mallet1Y);
     mallet2.attr('cx', worldState.mallet2X);
     mallet2.attr('cy', worldState.mallet2Y);
-    score1.attr('text', worldState.score1);
-    score2.attr('text', worldState.score2);
+    if ( worldState.score1 >= 5 ){
+      score1.attr('text', 5);
+      if (player === 1){
+        var message = paper.text(width / 2, height/2, 'You won!');
+      } else {
+        var message = paper.text(width / 2, height/2, 'You lost!');
+      }
+    } else {
+      score1.attr('text', worldState.score1);
+    }
+    if ( worldState.score2 >= 5 ){
+      score1.attr('text', 5);
+      if (player === 2){
+        var message = paper.text(width / 2, height/2, 'You won!');
+      } else {
+        var message = paper.text(width / 2, height/2, 'You lost!');
+      }
+    } else {
+      score2.attr('text', worldState.score2);
+    }
+    message.attr("font-size", 80);
   };
 
   socket.on('positionsUpdated', function(data){
-    console.log(data);
     updateBoard(data);
   });
 };

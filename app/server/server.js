@@ -77,7 +77,6 @@ io.sockets.on('connection', function (socket) {
     physics.updateMallet(data);
   });
 
-
   //handles disconnects and subsequently deletes the user
   socket.on('disconnect', function(){
     delete users[socket];
