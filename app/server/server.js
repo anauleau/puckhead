@@ -94,6 +94,7 @@ io.sockets.on('connection', function (socket) {
   });
 });
 
+//serves static files
 app.use(express.static(__dirname + '/../client'));
 app.use(express.static(__dirname + '/../styles'));
 app.use(express.static(__dirname + '/../vendor'));
