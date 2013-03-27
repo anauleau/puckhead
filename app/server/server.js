@@ -20,7 +20,7 @@ app.get('/', function (req, res) {
 });
 
 io.sockets.on('connection', function (socket) {
-  //create new user on connection - gives user socket property
+//create new user on connection - gives user socket property
   users[socket.id] = new User(socket);
   var user = users[socket.id];
 
@@ -50,9 +50,9 @@ io.sockets.on('connection', function (socket) {
     lobby.rooms.waiting = room;
   }
 
-  socket.on('hi', function(data) {
-    console.log(user);
-    user.emit('hello', {room: user.room});
+  //On the Hi event,
+  socket.on('join', function(data) {
+    user.emit('roomEcho', {room: user.room});
   });
 
   socket.on('playerReady', function(data){

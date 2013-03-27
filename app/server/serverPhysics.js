@@ -17,14 +17,14 @@ var width         = 960,
 var createWorld = function(callback){
 
   // Box2D.
-  b2World = Box2D.Dynamics.b2World,
-  b2Vec2 = Box2D.Common.Math.b2Vec2,
-  b2BodyDef = Box2D.Dynamics.b2BodyDef,
-  b2Body = Box2D.Dynamics.b2Body,
-  b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape,
-  b2CircleShape = Box2D.Collision.Shapes.b2CircleShape,
-  b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
-  b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
+  b2World         = Box2D.Dynamics.b2World,
+  b2Vec2          = Box2D.Common.Math.b2Vec2,
+  b2BodyDef       = Box2D.Dynamics.b2BodyDef,
+  b2Body          = Box2D.Dynamics.b2Body,
+  b2PolygonShape  = Box2D.Collision.Shapes.b2PolygonShape,
+  b2CircleShape   = Box2D.Collision.Shapes.b2CircleShape,
+  b2FixtureDef    = Box2D.Dynamics.b2FixtureDef,
+  b2DebugDraw     = Box2D.Dynamics.b2DebugDraw;
 
   world = new b2World(new b2Vec2(0, 0), true);
 

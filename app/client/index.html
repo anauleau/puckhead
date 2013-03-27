@@ -22,7 +22,7 @@
 
     <script type="text/javascript">
       var socket = io.connect('http://localhost');
-      socket.on('hello', function(data) {
+      socket.on('roomEcho', function(data) {
         console.log(data);
       });
 
@@ -61,7 +61,7 @@
       socket.on('bothPlayersReady', function() {
         begin = true;
       });
-      socket.emit('hi');
+      socket.emit('join');
     </script>
 </body>
 </html>
