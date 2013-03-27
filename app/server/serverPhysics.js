@@ -88,11 +88,11 @@ exports.updateMallet = function( malletData ) {
   if ( malletData.player === 1 ){
     var mallet1YDiff = (malletData.y * worldCoeff) - mallet1Body.GetPosition().y;
     var mallet1XDiff = (malletData.x * worldCoeff) - mallet1Body.GetPosition().x;
-    mallet1Body.SetLinearVelocity(new b2Vec2((mallet1XDiff / 60) * 70, (mallet1YDiff / 60) * 70));
+    mallet1Body.SetLinearVelocity(new b2Vec2((mallet1XDiff / 60) * 500, (mallet1YDiff / 60) * 500));
   } else {
     var mallet2XDiff = (malletData.x * worldCoeff) - mallet2Body.GetPosition().x;
     var mallet2YDiff = (malletData.y * worldCoeff) - mallet2Body.GetPosition().y;
-    mallet2Body.SetLinearVelocity(new b2Vec2((mallet2XDiff / 60) * 70, (mallet2YDiff / 60) * 70));
+    mallet2Body.SetLinearVelocity(new b2Vec2((mallet2XDiff / 60) * 500, (mallet2YDiff / 60) * 500));
   }
 };
 

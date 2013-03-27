@@ -240,7 +240,6 @@ window.onload = function() {
   });
 
   var interval;
-  
   var start = function(){
     if (interval) return;
     myTimer = window.setInterval(update, 1000 / 60);
