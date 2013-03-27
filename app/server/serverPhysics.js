@@ -1,18 +1,18 @@
 var Box2D = require('./box2dnodeold.js');
 
 // Define dimensions of objects.
-var width  = 960;
-var height = 480;
-var sizeUnit = height / 100;
-var puckRadius = 6 * sizeUnit;
-var puckX = width / 2;
-var puckY = height / 2;
-var malletRadius = 10 * sizeUnit;
-var gatesWidth = 5 * sizeUnit;
-var gatesHeight = 33 * sizeUnit;
-var worldCoeff = 0.01;  // Try scaling the world by this factor.
-var score1 = 0;
-var score2 = 0;
+var width         = 960,
+    height        = 480,
+    sizeUnit      = height / 100,
+    puckRadius    = 6 * sizeUnit,
+    puckX         = width / 2,
+    puckY         = height / 2,
+    malletRadius  = 10 * sizeUnit,
+    gatesWidth    = 5 * sizeUnit,
+    gatesHeight   = 33 * sizeUnit,
+    worldCoeff    = 0.01,  // Try scaling the world by this factor.
+    score1        = 0,
+    score2        = 0;
 
 var createWorld = function(callback){
 
@@ -121,14 +121,23 @@ var update = function() {
 
 exports.watchWorldState = function(){
   var newWorldState = {};
+
+  //user 1 x & y
   newWorldState.mallet1X = mallet1Body.GetPosition().x / worldCoeff;
   newWorldState.mallet1Y = mallet1Body.GetPosition().y / worldCoeff;
+
+  //user2 x & y
   newWorldState.mallet2X = mallet2Body.GetPosition().x / worldCoeff;
   newWorldState.mallet2Y = mallet2Body.GetPosition().y / worldCoeff;
+
+  //puck x & y
   newWorldState.puckX = puckBody.GetPosition().x / worldCoeff;
   newWorldState.puckY = puckBody.GetPosition().y / worldCoeff;
+
+  //scores
   newWorldState.score1 = score1;
   newWorldState.score2 = score2;
+
   return newWorldState;
 };
 

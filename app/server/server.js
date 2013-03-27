@@ -1,4 +1,4 @@
-//naive server
+//server
 
 var express = require('express'),
     app     = express(),
