@@ -60,12 +60,22 @@ io.sockets.on('connection', function (socket) {
     thisRoom.readyPlayers.push(data.player);
 
     if (thisRoom.readyPlayers.length === 2) {
+
+      //emits both players ready to each player from the other
       user.emit('bothPlayersReady');
       users[user.other].emit('bothPlayersReady');
+
+      //creates new physics environment
       physics.createWorld(function(){
-      physics.start();
-      setInterval(function(){
+
+        //starts physics engine
+        physics.start();
+        setInterval(function(){
+
+          //observes new world state
           var worldState = physics.watchWorldState();
+
+          //emits both players updated position to each player from the other
           user.emit('positionsUpdated', worldState);
           users[user.other].emit('positionsUpdated', worldState);
         }, 20);
