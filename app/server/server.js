@@ -55,26 +55,34 @@ io.sockets.on('connection', function (socket) {
     user.emit('hello', {room: user.room});
   });
 
-  socket.on('playerReady', function(data){
+  var setUser = function(user) {
+    console.log('SETUSER RUN');
+    var user = user;
+    var func = function(){
+          var worldState = physics.watchWorldState(user.room);
+          user.emit('positionsUpdated', worldState);
+          users[user.other].emit('positionsUpdated', worldState);
+        };
+
+    return func;
+  };
+
+  socket.on('playerReady', function(data) {
     var thisRoom = lobby.rooms.active[user.room];
     thisRoom.readyPlayers.push(data.player);
 
     if (thisRoom.readyPlayers.length === 2) {
       user.emit('bothPlayersReady');
       users[user.other].emit('bothPlayersReady');
-      physics.createWorld(function(){
-      physics.start();
-      setInterval(function(){
-          var worldState = physics.watchWorldState();
-          user.emit('positionsUpdated', worldState);
-          users[user.other].emit('positionsUpdated', worldState);
-        }, 20);
+      physics.createWorld(user.room, function() {
+      physics.start(user.room);
+      setInterval(setUser(user), 20);
       });
     };
   });
 
   socket.on('move', function (data) {
-    physics.updateMallet(data);
+    physics.updateMallet(data, user.room);
   });
 
   //handles disconnects and subsequently deletes the user

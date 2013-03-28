@@ -1,22 +1,25 @@
 var Box2D = require('./box2dnodeold.js');
 
-// Define dimensions of objects.
-var width  = 960;
-var height = 480;
-var sizeUnit = height / 100;
-var puckRadius = 6 * sizeUnit;
-var puckX = width / 2;
-var puckY = height / 2;
-var malletRadius = 10 * sizeUnit;
-var gatesWidth = 5 * sizeUnit;
-var gatesHeight = 33 * sizeUnit;
-var worldCoeff = 0.01;  // Try scaling the world by this factor.
-var score1 = 0;
-var score2 = 0;
+var worldHash = {};
 
-var createWorld = function(callback){
+  // Define dimensions of objects.
+  var width  = 960;
+  var height = 480;
+  var sizeUnit = height / 100;
+  var puckRadius = 6 * sizeUnit;
+  var malletRadius = 10 * sizeUnit;
+  var gatesWidth = 5 * sizeUnit;
+  var gatesHeight = 33 * sizeUnit;
+  var worldCoeff = 0.01;  // Try scaling the world by this factor.
 
-  // Box2D.
+var createWorld = function(roomId, callback){
+
+  var thisWorld = {};
+  thisWorld.puckX = width / 2;
+  thisWorld.puckY = height / 2;
+  thisWorld.score1 = 0;
+  thisWorld.score2 = 0;
+
   b2World = Box2D.Dynamics.b2World,
   b2Vec2 = Box2D.Common.Math.b2Vec2,
   b2BodyDef = Box2D.Dynamics.b2BodyDef,
@@ -59,10 +62,10 @@ var createWorld = function(callback){
   bodyDef.type = b2Body.b2_dynamicBody;
   fixDef.shape = new b2CircleShape;
   fixDef.shape.SetRadius( puckRadius * worldCoeff );
-  bodyDef.position.Set( puckX * worldCoeff, puckY * worldCoeff );
-  puckBody = world.CreateBody(bodyDef);
-  puckBody.CreateFixture(fixDef);
-  puckBody.SetLinearVelocity( new b2Vec2(4, 2) );  // Temp.
+  bodyDef.position.Set( thisWorld.puckX * worldCoeff, thisWorld.puckY * worldCoeff );
+  thisWorld.puckBody = world.CreateBody(bodyDef);
+  thisWorld.puckBody.CreateFixture(fixDef);
+  thisWorld.puckBody.SetLinearVelocity( new b2Vec2(4, 2) );  // Temp.
 
   malletFixDef = new b2FixtureDef;
   malletFixDef.density = 100.0;
@@ -73,74 +76,79 @@ var createWorld = function(callback){
   malletFixDef.shape = new b2CircleShape;
   malletFixDef.shape.SetRadius( malletRadius * worldCoeff );
   bodyDef.position.Set( height / 4 * worldCoeff, height / 2 * worldCoeff );
-  mallet1Body = world.CreateBody(bodyDef);
-  mallet1Body.CreateFixture(malletFixDef);
+  thisWorld.mallet1Body = world.CreateBody(bodyDef);
+  thisWorld.mallet1Body.CreateFixture(malletFixDef);
   bodyDef.position.Set( (width - height / 4) * worldCoeff, height / 2 * worldCoeff );
-  mallet2Body = world.CreateBody(bodyDef);
-  mallet2Body.CreateFixture(malletFixDef);
+  thisWorld.mallet2Body = world.CreateBody(bodyDef);
+  thisWorld.mallet2Body.CreateFixture(malletFixDef);
 
+  worldHash[roomId] = thisWorld;
   callback();
-
 };
 
 //takes new x and y, moves the mallet toward that position at all times.
-exports.updateMallet = function( malletData ) {
-  if ( malletData.player === 1 ){
-    var mallet1YDiff = (malletData.y * worldCoeff) - mallet1Body.GetPosition().y;
-    var mallet1XDiff = (malletData.x * worldCoeff) - mallet1Body.GetPosition().x;
-    mallet1Body.SetLinearVelocity(new b2Vec2((mallet1XDiff / 60) * 500, (mallet1YDiff / 60) * 500));
+exports.updateMallet = function( malletData, roomId ) {
+  if (malletData.player === 1){
+    var mallet1YDiff = (malletData.y * worldCoeff) - worldHash[roomId].mallet1Body.GetPosition().y;
+    var mallet1XDiff = (malletData.x * worldCoeff) - worldHash[roomId].mallet1Body.GetPosition().x;
+    worldHash[roomId].mallet1Body.SetLinearVelocity(new b2Vec2((mallet1XDiff / 60) * 500, (mallet1YDiff / 60) * 500));
   } else {
-    var mallet2XDiff = (malletData.x * worldCoeff) - mallet2Body.GetPosition().x;
-    var mallet2YDiff = (malletData.y * worldCoeff) - mallet2Body.GetPosition().y;
-    mallet2Body.SetLinearVelocity(new b2Vec2((mallet2XDiff / 60) * 500, (mallet2YDiff / 60) * 500));
+    var mallet2XDiff = (malletData.x * worldCoeff) - worldHash[roomId].mallet2Body.GetPosition().x;
+    var mallet2YDiff = (malletData.y * worldCoeff) - worldHash[roomId].mallet2Body.GetPosition().y;
+    worldHash[roomId].mallet2Body.SetLinearVelocity(new b2Vec2((mallet2XDiff / 60) * 500, (mallet2YDiff / 60) * 500));
   }
 };
 
-var updateScore = function(){
+var updateScore = function(roomId){
+
   var reload = false;
-  if ( puckBody.GetPosition().x < gatesWidth * worldCoeff ){
-    score2++;
+  if ( worldHash[roomId].puckBody.GetPosition().x < gatesWidth * worldCoeff ){
+    worldHash[roomId].score2++;
     reload = true;
   }
-  if ( puckBody.GetPosition().x > (width-gatesWidth) * worldCoeff ) {
-    score1++;
+  if ( worldHash[roomId].puckBody.GetPosition().x > (width-gatesWidth) * worldCoeff ) {
+    worldHash[roomId].score1++;
     reload = true;
   }
-  if ( score1 >= 5 || score2 >= 5 ){
+  if ( worldHash[roomId].score1 >= 5 || worldHash[roomId].score2 >= 5 ){
     stop();
   } else if (reload){
     createWorld(function(){});
   }
 };
 
-var update = function() {
-  updateScore();
-  world.Step(1 / 60, 10, 10);
-  world.ClearForces();
-};
+ var updateFunc = function(roomId) {
+    var roomId = roomId;
+    var func = function(){
+      updateScore(roomId);
+      world.Step(1 / 60, 10, 10);
+      world.ClearForces();
+    };
 
-exports.watchWorldState = function(){
+    return func;
+  };
+
+exports.watchWorldState = function(roomId){
   var newWorldState = {};
-  newWorldState.mallet1X = mallet1Body.GetPosition().x / worldCoeff;
-  newWorldState.mallet1Y = mallet1Body.GetPosition().y / worldCoeff;
-  newWorldState.mallet2X = mallet2Body.GetPosition().x / worldCoeff;
-  newWorldState.mallet2Y = mallet2Body.GetPosition().y / worldCoeff;
-  newWorldState.puckX = puckBody.GetPosition().x / worldCoeff;
-  newWorldState.puckY = puckBody.GetPosition().y / worldCoeff;
-  newWorldState.score1 = score1;
-  newWorldState.score2 = score2;
+  newWorldState.mallet1X = worldHash[roomId].mallet1Body.GetPosition().x / worldCoeff;
+  newWorldState.mallet1Y = worldHash[roomId].mallet1Body.GetPosition().y / worldCoeff;
+  newWorldState.mallet2X = worldHash[roomId].mallet2Body.GetPosition().x / worldCoeff;
+  newWorldState.mallet2Y = worldHash[roomId].mallet2Body.GetPosition().y / worldCoeff;
+  newWorldState.puckX = worldHash[roomId].puckBody.GetPosition().x / worldCoeff;
+  newWorldState.puckY = worldHash[roomId].puckBody.GetPosition().y / worldCoeff;
+  newWorldState.score1 = worldHash[roomId].score1;
+  newWorldState.score2 = worldHash[roomId].score2;
   return newWorldState;
 };
 
-var interval;
-exports.start = function(){
-  if (interval) return;
-  myTimer = setInterval(update, 1000 / 60);
+exports.start = function(roomId){
+  console.log('roomid here ---------------------------------------', roomId);
+  myTimer = setInterval(updateFunc(roomId), 1000 / 60);
 };
 
 var stop = function(){
   clearInterval(myTimer);
-  interval = null;
+  myTimer = null;
 };
 
 exports.createWorld = createWorld;
