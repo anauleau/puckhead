@@ -97,24 +97,40 @@ exports.updateMallet = function( malletData ) {
 };
 
 var updateScore = function(){
-  var reload = false;
-  if ( puckBody.GetPosition().x < gatesWidth * worldCoeff ){
-    score2++;
-    reload = true;
-  }
-  if ( puckBody.GetPosition().x > (width-gatesWidth) * worldCoeff ) {
-    score1++;
-    reload = true;
-  }
   if ( score1 >= 5 || score2 >= 5 ){
     stop();
-  } else if (reload){
+  } else if ( puckBody.GetPosition().x < gatesWidth * worldCoeff ){
+    score2++;
     createWorld(function(){});
+  } else if ( puckBody.GetPosition().x > (width-gatesWidth) * worldCoeff ) {
+    score1++;
+    createWorld(function(){});
+  }
+};
+
+var updatePuck = function(){
+  puckBody.SetLinearVelocity(new b2Vec2(puckBody.m_linearVelocity.x * 0.995, puckBody.m_linearVelocity.y * 0.995));
+  if ( puckBody.m_linearVelocity.y <= 0.1 ){
+    if ( puckBody.GetPosition().y <= puckRadius * 1.1 * worldCoeff ){
+      puckBody.SetLinearVelocity(new b2Vec2(puckBody.m_linearVelocity.x, 0.3));
+    }
+    if ( puckBody.GetPosition().y >= (height - puckRadius * 1.1) * worldCoeff ){
+      puckBody.SetLinearVelocity(new b2Vec2(puckBody.m_linearVelocity.x, - 0.3));
+    }
+  }
+  if ( puckBody.m_linearVelocity.x <= 0.1 ){
+    if ( puckBody.GetPosition().x <= (gatesWidth + puckRadius) * 1.1 * worldCoeff ){
+      puckBody.SetLinearVelocity( new b2Vec2( 0.3, puckBody.m_linearVelocity.y ) );
+    }
+    if ( puckBody.GetPosition().x >= (width - gatesWidth - puckRadius * 1.1) * worldCoeff ){
+      puckBody.SetLinearVelocity( new b2Vec2( -0.3, puckBody.m_linearVelocity.y ) );
+    }
   }
 };
 
 var update = function() {
   updateScore();
+  updatePuck();
   world.Step(1 / 60, 10, 10);
   world.ClearForces();
 };
