@@ -30,6 +30,7 @@ io.sockets.on('connection', function (socket) {
     var room = lobby.rooms.waiting;
     room.user2 = user;
     lobby.rooms.active[room.roomID] = room;
+    socket.emit('assignPlayerNumber', 2);
 
     //assign each room's user with a room property
     room.user1.room   = room.roomID;
@@ -47,6 +48,7 @@ io.sockets.on('connection', function (socket) {
     var room = new Room();
     room.user1 = user;
     room.user1.room = room.roomID;
+    socket.emit('assignPlayerNumber', 1);
     lobby.rooms.waiting = room;
   }
 
@@ -55,30 +57,37 @@ io.sockets.on('connection', function (socket) {
     user.emit('hello', {room: user.room});
   });
 
-  socket.on('playerReady', function(data){
+  var setUser = function(user) {
+    var user = user;
+    var func = function(){
+          var worldState = physics.watchWorldState(user.room);
+          user.emit('positionsUpdated', worldState);
+          users[user.other].emit('positionsUpdated', worldState);
+        };
+
+    return func;
+  };
+
+  socket.on('playerReady', function(data) {
     var thisRoom = lobby.rooms.active[user.room];
     thisRoom.readyPlayers.push(data.player);
 
     if (thisRoom.readyPlayers.length === 2) {
       user.emit('bothPlayersReady');
       users[user.other].emit('bothPlayersReady');
-      physics.createWorld(function(){
-      physics.start();
-      setInterval(function(){
-          var worldState = physics.watchWorldState();
-          user.emit('positionsUpdated', worldState);
-          users[user.other].emit('positionsUpdated', worldState);
-        }, 20);
+      thisRoom.world = physics.createWorld(user.room, function() {
+      physics.start(user.room);
+      setInterval(setUser(user), 20);
       });
     };
   });
 
   socket.on('move', function (data) {
-    physics.updateMallet(data);
+    physics.updateMallet(data, user.room);
   });
 
   //handles disconnects and subsequently deletes the user
-  socket.on('disconnect', function(){
+  socket.on('disconnect', function() {
     delete users[socket];
     io.sockets.emit('user disconnected');
   });
