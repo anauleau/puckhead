@@ -12,8 +12,7 @@ var worldHash = {};
   var gatesHeight = 33 * sizeUnit;
   var worldCoeff = 0.01;  // Try scaling the world by this factor.
 
-var createWorld = function(roomId, callback){
-
+var createWorld = function(roomId, callback) {
   var thisWorld = {};
   thisWorld.puckX = width / 2;
   thisWorld.puckY = height / 2;
@@ -30,6 +29,8 @@ var createWorld = function(roomId, callback){
   b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
 
   world = new b2World(new b2Vec2(0, 0), true);
+
+  thisWorld.world = world;
 
   fixDef = new b2FixtureDef;
   fixDef.density = 1.0;
@@ -99,10 +100,10 @@ exports.updateMallet = function( malletData, roomId ) {
   }
 };
 
-var updateScore = function(roomId){
+var updateScore = function(roomId) {
 
   var reload = false;
-  if ( worldHash[roomId].puckBody.GetPosition().x < gatesWidth * worldCoeff ){
+  if ( worldHash[roomId].puckBody.GetPosition().x < gatesWidth * worldCoeff ) {
     worldHash[roomId].score2++;
     reload = true;
   }
@@ -110,25 +111,25 @@ var updateScore = function(roomId){
     worldHash[roomId].score1++;
     reload = true;
   }
-  if ( worldHash[roomId].score1 >= 5 || worldHash[roomId].score2 >= 5 ){
+  if ( worldHash[roomId].score1 >= 5 || worldHash[roomId].score2 >= 5 ) {
     stop();
   } else if (reload){
-    createWorld(function(){});
+    createWorld(roomId, function(){});
   }
 };
 
  var updateFunc = function(roomId) {
     var roomId = roomId;
-    var func = function(){
+    var func = function() {
       updateScore(roomId);
-      world.Step(1 / 60, 10, 10);
-      world.ClearForces();
+      worldHash[roomId].world.Step(1 / 60, 10, 10);
+      worldHash[roomId].world.ClearForces();
     };
 
     return func;
   };
 
-exports.watchWorldState = function(roomId){
+exports.watchWorldState = function(roomId) {
   var newWorldState = {};
   newWorldState.mallet1X = worldHash[roomId].mallet1Body.GetPosition().x / worldCoeff;
   newWorldState.mallet1Y = worldHash[roomId].mallet1Body.GetPosition().y / worldCoeff;
@@ -141,12 +142,11 @@ exports.watchWorldState = function(roomId){
   return newWorldState;
 };
 
-exports.start = function(roomId){
-  console.log('roomid here ---------------------------------------', roomId);
+exports.start = function(roomId) {
   myTimer = setInterval(updateFunc(roomId), 1000 / 60);
 };
 
-var stop = function(){
+var stop = function() {
   clearInterval(myTimer);
   myTimer = null;
 };

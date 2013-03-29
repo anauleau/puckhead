@@ -30,6 +30,7 @@ io.sockets.on('connection', function (socket) {
     var room = lobby.rooms.waiting;
     room.user2 = user;
     lobby.rooms.active[room.roomID] = room;
+    socket.emit('assignPlayerNumber', 2);
 
     //assign each room's user with a room property
     room.user1.room   = room.roomID;
@@ -47,6 +48,7 @@ io.sockets.on('connection', function (socket) {
     var room = new Room();
     room.user1 = user;
     room.user1.room = room.roomID;
+    socket.emit('assignPlayerNumber', 1);
     lobby.rooms.waiting = room;
   }
 
@@ -56,7 +58,6 @@ io.sockets.on('connection', function (socket) {
   });
 
   var setUser = function(user) {
-    console.log('SETUSER RUN');
     var user = user;
     var func = function(){
           var worldState = physics.watchWorldState(user.room);
@@ -74,7 +75,7 @@ io.sockets.on('connection', function (socket) {
     if (thisRoom.readyPlayers.length === 2) {
       user.emit('bothPlayersReady');
       users[user.other].emit('bothPlayersReady');
-      physics.createWorld(user.room, function() {
+      thisRoom.world = physics.createWorld(user.room, function() {
       physics.start(user.room);
       setInterval(setUser(user), 20);
       });
@@ -86,7 +87,7 @@ io.sockets.on('connection', function (socket) {
   });
 
   //handles disconnects and subsequently deletes the user
-  socket.on('disconnect', function(){
+  socket.on('disconnect', function() {
     delete users[socket];
     io.sockets.emit('user disconnected');
   });
