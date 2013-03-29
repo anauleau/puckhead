@@ -7,9 +7,11 @@ var rooms = {
 
 
 //change name to better represent what this hash is storing
-var privateLobby = {
-  'http://localhost:8000/private':'http://localhost:8000/private'
+
+//just store uuid aas opposed to the entire url
+var privateRoutes = {
+  'http://localhost:8000/private':'1',
 };
 
 module.exports.rooms = rooms;
-module.exports.privateLobby = privateLobby;
+module.exports.privateRoutes = privateRoutes;
