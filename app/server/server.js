@@ -13,7 +13,7 @@ var express = require('express'),
     u      = require('underscore'),
     users   = {};
 
-server.listen(8080);
+server.listen(8000);
 
 //get request handler
 app.get('/', function (req, res) {
