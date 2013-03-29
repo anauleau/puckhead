@@ -1,4 +1,5 @@
 var Box2D = require('./box2dnodeold.js');
+var lobby = require('./lobby.js')
 
 var worldHash = {};
 
@@ -100,19 +101,19 @@ exports.updateMallet = function( malletData, roomId ) {
   }
 };
 
-var updateScore = function(){
-  if ( worldHash[roomId].score1 >= 5 || worldHash[roomId].score2 >= 5 ){
+var updateScore = function(roomId) {
+  if ( lobby.rooms.active[roomId].score1 >= 5 || lobby.rooms.active[roomId].score2 >= 5 ){
     stop();
   } else if ( worldHash[roomId].puckBody.GetPosition().x < gatesWidth * worldCoeff ){
-    worldHash[roomId].score2++;
-    createWorld(function(){});
+    lobby.rooms.active[roomId].score2++;
+    createWorld(roomId, function(){});
   } else if ( worldHash[roomId].puckBody.GetPosition().x > (width-gatesWidth) * worldCoeff ) {
-    worldHash[roomId].score1++;
+    lobby.rooms.active[roomId].score1++;
     createWorld(roomId, function(){});
   }
 };
 
-var updatePuck = function(roomId){
+var updatePuck = function(roomId) {
   worldHash[roomId].puckBody.SetLinearVelocity(new b2Vec2(worldHash[roomId].puckBody.m_linearVelocity.x * 0.995, worldHash[roomId].puckBody.m_linearVelocity.y * 0.995));
   if ( worldHash[roomId].puckBody.m_linearVelocity.y <= 0.1 ){
     if ( worldHash[roomId].puckBody.GetPosition().y <= puckRadius * 1.1 * worldCoeff ){
@@ -151,8 +152,8 @@ exports.watchWorldState = function(roomId) {
   newWorldState.mallet2Y = worldHash[roomId].mallet2Body.GetPosition().y / worldCoeff;
   newWorldState.puckX = worldHash[roomId].puckBody.GetPosition().x / worldCoeff;
   newWorldState.puckY = worldHash[roomId].puckBody.GetPosition().y / worldCoeff;
-  newWorldState.score1 = worldHash[roomId].score1;
-  newWorldState.score2 = worldHash[roomId].score2;
+  newWorldState.score1 = lobby.rooms.active[roomId].score1;
+  newWorldState.score2 = lobby.rooms.active[roomId].score2;
   return newWorldState;
 };
 
@@ -166,4 +167,3 @@ var stop = function() {
 };
 
 exports.createWorld = createWorld;
-
