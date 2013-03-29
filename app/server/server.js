@@ -26,53 +26,87 @@ app.get('/private', function (req, res) {
 
 io.sockets.on('connection', function (socket) {
 //create new user on connection - gives user socket property
-  var url;
+  var url,
+      user,
+      room;
+
   socket.on('origin', function (data) {
     url = data.url;
-    console.log("origin event triggered. socket id: " + socket.id);
+    socket.emit('ready', {url: data.url});
+    // console.log("origin event triggered. socket id: " + socket.id);
   });
 
-  users[socket.id] = new User(socket);
-  var user = users[socket.id];
+  socket.on('start', function (data) {
 
-  console.log(lobby.privateLobby);
-  console.log("starting private room. socket id: " + socket.id);
-  debugger;
-  if(u.contains(lobby.privateLobby, url)) {
-    console.log('werks');
-  } else {
-    console.log('doesnt werks')
-  }
-  //conditional to deal with new users
-    //case one - new user joins existing room
-    if (lobby.rooms.waiting) {
-      var room = lobby.rooms.waiting;
-      room.user2 = user;
-      lobby.rooms.active[room.roomID] = room;
+    users[socket.id]  = new User(socket),
+    user              = users[socket.id],
+    user.url          = url;
 
-      //assign each room's user with a room property
-      room.user1.room   = room.roomID;
-      room.user2.room   = room.roomID;
+    if(u.contains(lobby.privateLobby, user.url)) {
+      //private room code
 
-      //assign each room's user an 'other' property to identify other room's user
-      room.user1.other  = room.user2.id;
-      room.user2.other  = room.user1.id;
+      if (lobby.rooms.privateWaiting[user.url]){
+        room = lobby.rooms.privateWaiting[user.url];
+        room.user2 = user;
+        lobby.rooms.active[room.roomID] = room;
 
-      //sets waitng to undefined
-      lobby.rooms.waiting = undefined;
+        //assign each room's user with a room property
+        room.user1.room   = room.roomID;
+        room.user2.room   = room.roomID;
 
-    //case two - else new room created for user, they are waiting
+        //assign each room's user an 'other' property to identify other room's user
+        room.user1.other  = room.user2.id;
+        room.user2.other  = room.user1.id;
+        console.log('PRIVATE USER 2 in room: ', room.roomID);
+        //sets waitng to undefined
+        lobby.rooms.privateWaiting[room.roomID] = undefined;
+
+      } else {
+        room                = new Room();
+        user.room           = room;
+        room.roomID         = user.url;
+        room.user1          = user;
+        room.user1.room     = room.roomID;
+        lobby.rooms.privateWaiting[room.roomID] = room;
+        console.log('PRIVATE USER 1 in room: ', room.roomID);
+      }
+      //the room should be
     } else {
-      var room = new Room();
-      room.user1 = user;
-      room.user1.room = room.roomID;
-      lobby.rooms.waiting = room;
+    //conditional to deal with new users
+      //case one - new user joins existing room
+      if (lobby.rooms.waiting) {
+
+        room = lobby.rooms.waiting;
+        room.user2 = user;
+        lobby.rooms.active[room.roomID] = room;
+
+        //assign each room's user with a room property
+        room.user1.room   = room.roomID;
+        room.user2.room   = room.roomID;
+
+        //assign each room's user an 'other' property to identify other room's user
+        room.user1.other  = room.user2.id;
+        room.user2.other  = room.user1.id;
+        console.log('PUBLIC USER 2 in room: ', room.roomID);
+        //sets waitng to undefined
+        lobby.rooms.waiting = undefined;
+
+      //case two - else new room created for user, they are waiting
+      } else {
+        room                = new Room();
+        user.room           = room;
+        room.user1          = user;
+        room.user1.room     = room.roomID;
+        lobby.rooms.waiting = room;
+        console.log('PUBLIC USER 1 in room: ', room.roomID);
+      }
     }
+  });
 
   //On the Hi event,
-  socket.on('join', function(data) {
-    user.emit('roomEcho', {room: user.room});
-  });
+  // socket.on('join', function(data) {
+  //   user.emit('roomEcho', {room: user.room});
+  // });
 
   socket.on('playerReady', function(data){
     var thisRoom = lobby.rooms.active[user.room] || lobby.rooms.waiting;
