@@ -53,7 +53,6 @@ io.sockets.on('connection', function (socket) {
   }
 
   socket.on('hi', function(data) {
-    console.log(user);
     user.emit('hello', {room: user.room});
   });
 

@@ -1,4 +1,5 @@
 var Box2D = require('./box2dnodeold.js');
+var lobby = require('./lobby');
 
 var worldHash = {};
 
@@ -89,7 +90,7 @@ var createWorld = function(roomId, callback) {
 
 //takes new x and y, moves the mallet toward that position at all times.
 exports.updateMallet = function( malletData, roomId ) {
-  if (malletData.player === 1){
+  if (malletData.player === 1) {
     var mallet1YDiff = (malletData.y * worldCoeff) - worldHash[roomId].mallet1Body.GetPosition().y;
     var mallet1XDiff = (malletData.x * worldCoeff) - worldHash[roomId].mallet1Body.GetPosition().x;
     worldHash[roomId].mallet1Body.SetLinearVelocity(new b2Vec2((mallet1XDiff / 60) * 500, (mallet1YDiff / 60) * 500));
@@ -104,16 +105,16 @@ var updateScore = function(roomId) {
 
   var reload = false;
   if ( worldHash[roomId].puckBody.GetPosition().x < gatesWidth * worldCoeff ) {
-    worldHash[roomId].score2++;
+    lobby.rooms.active[roomId].score2++;
     reload = true;
   }
   if ( worldHash[roomId].puckBody.GetPosition().x > (width-gatesWidth) * worldCoeff ) {
-    worldHash[roomId].score1++;
+    lobby.rooms.active[roomId].score1++;
     reload = true;
   }
   if ( worldHash[roomId].score1 >= 5 || worldHash[roomId].score2 >= 5 ) {
     stop();
-  } else if (reload){
+  } else if (reload) {
     createWorld(roomId, function(){});
   }
 };
@@ -137,8 +138,9 @@ exports.watchWorldState = function(roomId) {
   newWorldState.mallet2Y = worldHash[roomId].mallet2Body.GetPosition().y / worldCoeff;
   newWorldState.puckX = worldHash[roomId].puckBody.GetPosition().x / worldCoeff;
   newWorldState.puckY = worldHash[roomId].puckBody.GetPosition().y / worldCoeff;
-  newWorldState.score1 = worldHash[roomId].score1;
-  newWorldState.score2 = worldHash[roomId].score2;
+  newWorldState.score1 = lobby.rooms.active[roomId].score1;
+  newWorldState.score2 = lobby.rooms.active[roomId].score2;
+
   return newWorldState;
 };
 
