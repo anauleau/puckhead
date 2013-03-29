@@ -63,7 +63,6 @@ window.onload = function() {
   drawWorld();
 
 var updateBoard = function( worldState ){
-    console.log('in updateWorld');
     puck.attr('cx', worldState.puckX);
     puck.attr('cy', worldState.puckY);
     mallet1.attr('cx', worldState.mallet1X);
@@ -90,10 +89,10 @@ var updateBoard = function( worldState ){
     } else {
       score2.attr('text', worldState.score2);
     }
-    message.attr("font-size", 80);
   };
 
   socket.on('positionsUpdated', function(data){
+    console.log(data);
     updateBoard(data);
   });
 };
