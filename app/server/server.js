@@ -16,7 +16,11 @@ server.listen(8080);
 
 //get request handler
 app.get('/', function (req, res) {
-  res.sendfile(path.resolve(__dirname + '/../client/index.html'));
+  res.sendfile(path.resolve(__dirname + '/../client/splashpage.html'));
+});
+
+app.get('/game', function (req, res) {
+  res.sendfile(path.resolve(__dirname + '/../client/game.html'));
 });
 
 io.sockets.on('connection', function (socket) {
