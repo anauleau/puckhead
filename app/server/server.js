@@ -23,6 +23,10 @@ app.get('/game', function (req, res) {
   res.sendfile(path.resolve(__dirname + '/../client/game.html'));
 });
 
+app.get('/room_id', function (req, res) {
+  res.end('http://localhost:8080/game');
+});
+
 io.sockets.on('connection', function (socket) {
   //create new user on connection - gives user socket property
   users[socket.id] = new User(socket);
