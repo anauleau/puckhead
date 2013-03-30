@@ -2,7 +2,7 @@
   font-family: Destroy;
   src: url("DESTROY_-webfont.ttf");
 }
-body { 
+body {
   margin: 0px;
   background: url('subtlenet2.png');
   color: rgb(0, 0, 0);
@@ -20,6 +20,7 @@ svg {
   -ms-transform: scaleX(-1);
   transform : scaleX(-1);
   display: block;
+  margin: 0;
   position: absolute;
 }
 #curtain {
@@ -35,7 +36,7 @@ svg {
   margin: 20px;
 }
 .overlay {
-  margin: 0 auto;
+  margin: 0;
   position: absolute;
   width: 320px;
   height: 240px;
@@ -59,14 +60,14 @@ svg {
   padding-bottom: 3px;
   width: 70px;
 }
-.contain { 
-  width: 960px; 
-  margin: 80px auto; 
+.contain {
+  width: 960px;
+  margin: 80px auto;
 }
-#inputVideo { 
-  width: 320px; 
-  margin: 0 auto; 
-  display: block; 
+#inputVideo {
+  width: 320px;
+  margin: 0 auto;
+  display: block;
 }
 #introIllustration {
   width: 100%;
@@ -127,4 +128,10 @@ svg {
   width: 1020px;
   height: 40px;
   text-align: center;
+}
+.playerId {
+  margin: 300px 10px;
+}
+.ready {
+  z-index: 1000000;
 }
