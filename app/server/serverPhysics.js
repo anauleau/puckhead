@@ -1,4 +1,4 @@
-var Box2D = require('./box2dnodeold.js');
+var Box2D = require('../vendor/box2dnodeold.js');
 
 // Define dimensions of objects.
 var width  = 960;
