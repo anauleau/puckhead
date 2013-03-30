@@ -13,28 +13,27 @@ var express = require('express'),
     u       = require('underscore'),
     users   = {};
 
-server.listen(8000);
+server.listen(8080);
 
 app.get('/', function (req, res) {
-  res.sendfile(path.resolve(__dirname + '/../client/splashPage.html'));
+  res.sendfile(path.resolve(__dirname + '/../client/splashpage.html'));
 });
 
 app.get('/public', function (req, res) {
   res.sendfile(path.resolve(__dirname + '/../client/index.html'));
 });
 
-//-> code for the uuid handler
-// var urlPrefix = 'http://localhost:8000/private/'
-// privateRoutes[uuid] = urlPrefix + uuid;
-
 u.each(lobby.privateRoutes, function (url, id, obj) {
-  app.get('/private/' + id , function (req, res) {
+  app.get('/game/' + id , function (req, res) {
     res.sendfile(path.resolve(__dirname + '/../client/index.html'));
   });
 });
 
 app.get('/room_id', function (req, res) {
-  res.end('http://localhost:8080/game');
+  var urlPrefix = 'http://localhost:8080/game/';
+  var id = uuid.v1();
+  lobby.privateRoutes[id] = urlPrefix + id;
+  res.end(urlPrefix + id);
 });
 
 io.sockets.on('connection', function (socket) {
