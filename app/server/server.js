@@ -34,7 +34,7 @@ io.sockets.on('connection', function (socket) {
     var room = lobby.rooms.waiting;
     room.user2 = user;
     lobby.rooms.active[room.roomID] = room;
-    socket.emit('assignPlayerNumber', 2);
+    user.emit('assignPlayerNumber', {player: 2});
 
     //assign each room's user with a room property
     room.user1.room   = room.roomID;
@@ -52,12 +52,11 @@ io.sockets.on('connection', function (socket) {
     var room = new Room();
     room.user1 = user;
     room.user1.room = room.roomID;
-    socket.emit('assignPlayerNumber', 1);
+    user.emit('assignPlayerNumber', {player: 1});
     lobby.rooms.waiting = room;
   }
 
   socket.on('hi', function(data) {
-    console.log(user);
     user.emit('hello', {room: user.room});
   });
 
@@ -80,13 +79,14 @@ io.sockets.on('connection', function (socket) {
       user.emit('bothPlayersReady');
       users[user.other].emit('bothPlayersReady');
       thisRoom.world = physics.createWorld(user.room, function() {
-      physics.start(user.room);
-      setInterval(setUser(user), 20);
+        physics.start(user.room);
+        setInterval(setUser(user), 20);
       });
     };
   });
 
   socket.on('move', function (data) {
+    console.log(data, 'fk-----');
     physics.updateMallet(data, user.room);
   });
 
@@ -95,6 +95,7 @@ io.sockets.on('connection', function (socket) {
     delete users[socket];
     io.sockets.emit('user disconnected');
   });
+
 });
 
 app.use(express.static(__dirname + '/../client'));

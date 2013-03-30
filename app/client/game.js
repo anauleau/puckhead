@@ -18,11 +18,11 @@ $(document).ready(function(){
       $('#inputVideo').css( {'left': '10px', top: '10px'} );
       $('.ready').css( {'left': '10px', top: '260px'} );
       $('#canvas_container').css( {'left': '340px', top: '10px'} );
-    }     
+    }
   }
 });
 
-var socket = io.connect('http://localhost');
+var socket = io.connect('http://10.0.1.11');
 
 socket.on('hello', function(data) {
   console.log(data);
@@ -38,6 +38,14 @@ htracker.init(videoInput, canvasInput);
 htracker.start();
 
 var player;
+
+  socket.on('bothPlayersReady', function() {
+    begin = true;
+  });
+
+  socket.on('assignPlayerNumber', function(data) {
+    player = data.player;
+  });
 
 $('.ready').click(function (e) {
 
@@ -61,13 +69,7 @@ $('.ready').click(function (e) {
     }
   });
 
-  socket.on('bothPlayersReady', function() {
-    begin = true;
-  });
 
-  socket.on('assignPlayerNumber', function(data){
-    player = data;
-  });
 
   socket.emit('hi');
 

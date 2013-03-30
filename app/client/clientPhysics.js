@@ -71,7 +71,7 @@ var updateBoard = function( worldState ){
     mallet2.attr('cy', worldState.mallet2Y);
     if ( worldState.score1 >= 5 ){
       score1.attr('text', 5);
-      if (player === 1){
+      if (player === 1) {
         var message = paper.text(width / 2, height/2, 'You won!');
       } else {
         var message = paper.text(width / 2, height/2, 'You lost!');
@@ -79,7 +79,7 @@ var updateBoard = function( worldState ){
     } else {
       score1.attr('text', worldState.score1);
     }
-    if ( worldState.score2 >= 5 ){
+    if ( worldState.score2 >= 5 ) {
       score1.attr('text', 5);
       if (player === 2){
         var message = paper.text(width / 2, height/2, 'You won!');
@@ -92,7 +92,6 @@ var updateBoard = function( worldState ){
   };
 
   socket.on('positionsUpdated', function(data){
-    console.log(data);
     updateBoard(data);
   });
 };
