@@ -18,14 +18,22 @@ $(document).ready(function(){
       $('#inputVideo').css( {'left': '10px', top: '10px'} );
       $('.ready').css( {'left': '10px', top: '260px'} );
       $('#canvas_container').css( {'left': '340px', top: '10px'} );
-    }     
+    }
   }
 });
 
-var socket = io.connect('http://localhost');
+var url = document.URL;
+var socket = io.connect(); // TIP: .connect with no args does auto-discovery
+  socket.on('connect', function () { // TIP: you can avoid listening on `connect` and listen on events directly too!
+    socket.emit('origin', {url: url});
+});
 
-socket.on('hello', function(data) {
+socket.on('roomEcho', function (data) {
   console.log(data);
+});
+
+socket.on('ready', function (data) {
+  socket.emit('start', {url:data});
 });
 
 var begin = false;

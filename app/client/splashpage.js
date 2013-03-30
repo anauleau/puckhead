@@ -1,4 +1,4 @@
-var basicUrl = 'http://localhost:8080';
+var basicUrl = 'http://10.0.1.120:8080';
 var roomUrl;
 
 $(document).ready(function(){
