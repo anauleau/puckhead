@@ -27,7 +27,7 @@ app.get('/public', function (req, res) {
 // var urlPrefix = 'http://localhost:8000/private/'
 // privateRoutes[uuid] = urlPrefix + uuid;
 
-u.each(lobby.privateRoutes, function(url, id, obj){
+u.each(lobby.privateRoutes, function (url, id, obj) {
   app.get('/private/' + id , function (req, res) {
     res.sendfile(path.resolve(__dirname + '/../client/index.html'));
   });
@@ -50,7 +50,7 @@ io.sockets.on('connection', function (socket) {
     user              = users[socket.id],
     user.url          = url;
 
-    if(u.contains(lobby.privateRoutes, user.url)) {
+    if (u.contains(lobby.privateRoutes, user.url)) {
       if (lobby.rooms.privateWaiting[user.url]){
         room              = lobby.rooms.privateWaiting[user.url];
         room.user2        = user;
@@ -89,40 +89,38 @@ io.sockets.on('connection', function (socket) {
     user.emit('roomEcho', {room: user.room});
   });
 
-  socket.on('playerReady', function(data){
+  var setUser = function (user) {
+    var user = user;
+    var func = function (){
+          var worldState = physics.watchWorldState(user.room);
+          user.emit('positionsUpdated', worldState);
+          users[user.other].emit('positionsUpdated', worldState);
+        };
+
+    return func;
+  };
+
+  socket.on('playerReady', function (data) {
     var thisRoom = lobby.rooms.active[user.room] || lobby.rooms.waiting;
     thisRoom.readyPlayers.push(data.player);
     console.log('READY PLAYERS', thisRoom.readyPlayers);
     if (thisRoom.readyPlayers.length === 2) {
-
       //emits both players ready to each player from the other
       user.emit('bothPlayersReady');
       users[user.other].emit('bothPlayersReady');
-
-      //creates new physics environment
-      physics.createWorld(function(){
-
-        //starts physics engine
-        physics.start();
-        setInterval(function(){
-
-          //observes new world state
-          var worldState = physics.watchWorldState();
-
-          //emits both players updated position to each player from the other
-          user.emit('positionsUpdated', worldState);
-          users[user.other].emit('positionsUpdated', worldState);
-        }, 20);
+      thisRoom.world = physics.createWorld(user.room, function () {
+        physics.start(user.room);
+        setInterval(setUser(user), 20);
       });
     };
   });
 
   socket.on('move', function (data) {
-    physics.updateMallet(data);
+    physics.updateMallet(data, user.room);
   });
 
   //handles disconnects and subsequently deletes the user
-  socket.on('disconnect', function(){
+  socket.on('disconnect', function () {
     delete users[socket];
     io.sockets.emit('user disconnected');
   });

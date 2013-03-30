@@ -27,7 +27,7 @@
           socket.emit('origin', {url: url});
       });
 
-      socket.on('roomEcho', function(data) {
+      socket.on('roomEcho', function (data) {
         console.log(data);
       });
 
@@ -43,7 +43,7 @@
       htracker.init(videoInput, canvasInput);
       htracker.start();
 
-      var player = parseInt(prompt('1 or 2?'));
+      var player;
 
       $('.ready').click(function (e) {
 
@@ -70,7 +70,13 @@
       socket.on('bothPlayersReady', function() {
         begin = true;
       });
+
       socket.emit('join');
+
+      socket.on('assignPlayerNumber', function(data) {
+        player = data;
+      });
+
     </script>
 </body>
 </html>
