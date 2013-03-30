@@ -1,15 +1,15 @@
 <html>
 <head>
   <title>puckhead</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="/style.css" />
   <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
-    <script src="raphael.js"></script>
-    <script src="headtrackr.js"></script>
+    <script src="/raphael.js"></script>
+    <script src="/headtrackr.js"></script>
     <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-    <script src="Box2dWeb-2.1.a.3.min.js"></script>
-    <script src="clientPhysics.js"></script>
+    <script src="/Box2dWeb-2.1.a.3.min.js"></script>
+    <script src="/clientPhysics.js"></script>
 
     <div class="contain">
       <input type="button" class="ready" value="ready up"/>
@@ -21,17 +21,25 @@
     </div>
 
     <script type="text/javascript">
-      var socket = io.connect('http://10.0.1.11');
-      socket.on('hello', function(data) {
+      var url = document.URL;
+      var socket = io.connect(); // TIP: .connect with no args does auto-discovery
+        socket.on('connect', function () { // TIP: you can avoid listening on `connect` and listen on events directly too!
+          socket.emit('origin', {url: url});
+      });
+
+      socket.on('roomEcho', function (data) {
         console.log(data);
       });
 
-      var begin = false;
+      socket.on('ready', function (data) {
+        socket.emit('start', {url:data});
+      });
 
-      var videoInput = document.getElementById('inputVideo');
-      var canvasInput = document.getElementById('inputCanvas');
+      var begin       = false,
+          videoInput  = document.getElementById('inputVideo'),
+          canvasInput = document.getElementById('inputCanvas'),
+          htracker    = new headtrackr.Tracker();
 
-      var htracker = new headtrackr.Tracker();
       htracker.init(videoInput, canvasInput);
       htracker.start();
 
@@ -63,11 +71,12 @@
         begin = true;
       });
 
-      socket.on('assignPlayerNumber', function(data){
+      socket.emit('join');
+
+      socket.on('assignPlayerNumber', function(data) {
         player = data;
       });
 
-      socket.emit('hi');
     </script>
 </body>
 </html>

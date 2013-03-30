@@ -146,6 +146,7 @@ var updatePuck = function(roomId) {
 
 exports.watchWorldState = function(roomId) {
   var newWorldState = {};
+
   newWorldState.mallet1X = worldHash[roomId].mallet1Body.GetPosition().x / worldCoeff;
   newWorldState.mallet1Y = worldHash[roomId].mallet1Body.GetPosition().y / worldCoeff;
   newWorldState.mallet2X = worldHash[roomId].mallet2Body.GetPosition().x / worldCoeff;
@@ -154,6 +155,7 @@ exports.watchWorldState = function(roomId) {
   newWorldState.puckY = worldHash[roomId].puckBody.GetPosition().y / worldCoeff;
   newWorldState.score1 = lobby.rooms.active[roomId].score1;
   newWorldState.score2 = lobby.rooms.active[roomId].score2;
+
   return newWorldState;
 };
 
