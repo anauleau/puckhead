@@ -5,7 +5,7 @@ $(document).ready(function(){
 
 	$('.public').click(function(e){
 		e.preventDefault();
-		window.location = basicUrl + '/game';
+		window.location = basicUrl + '/public';
 	});
 
 	$('.private').click(function(e){

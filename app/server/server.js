@@ -20,13 +20,7 @@ app.get('/', function (req, res) {
 });
 
 app.get('/public', function (req, res) {
-  res.sendfile(path.resolve(__dirname + '/../client/index.html'));
-});
-
-u.each(lobby.privateRoutes, function (url, id, obj) {
-  app.get('/game/' + id , function (req, res) {
-    res.sendfile(path.resolve(__dirname + '/../client/index.html'));
-  });
+  res.sendfile(path.resolve(__dirname + '/../client/game.html'));
 });
 
 app.get('/room_id', function (req, res) {
@@ -34,6 +28,19 @@ app.get('/room_id', function (req, res) {
   var id = uuid.v1();
   lobby.privateRoutes[id] = urlPrefix + id;
   res.end(urlPrefix + id);
+});
+
+app.get('/game/:id', function (req, res) {
+  if (req.params.id.length === 36) {
+    var lobbyIdArray = u.keys(lobby.privateRoutes);
+    if (u.contains(lobbyIdArray, req.params.id)) {
+    res.sendfile(path.resolve(__dirname + '/../client/game.html'));
+    } else {
+    res.end();
+    }
+  } else {
+    res.end();
+  };
 });
 
 io.sockets.on('connection', function (socket) {
