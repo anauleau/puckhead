@@ -33,6 +33,10 @@ u.each(lobby.privateRoutes, function (url, id, obj) {
   });
 });
 
+app.get('/room_id', function (req, res) {
+  res.end('http://localhost:8080/game');
+});
+
 io.sockets.on('connection', function (socket) {
 
   var url,
