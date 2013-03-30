@@ -2,7 +2,7 @@
   font-family: Destroy;
   src: url("DESTROY_-webfont.ttf");
 }
-body { 
+body {
   margin: 0px;
   background: url('subtlenet2.png');
   color: rgb(0, 0, 0);
@@ -44,6 +44,7 @@ svg {
   opacity: 0.2;
 }
 #canvas_container {
+  top: 350px;
   margin: 0;
   position: absolute;
   background: url('subtlenet2.png');
@@ -59,14 +60,14 @@ svg {
   padding-bottom: 3px;
   width: 70px;
 }
-.contain { 
-  width: 960px; 
-  margin: 80px auto; 
+.contain {
+  width: 960px;
+  margin: 80px auto;
 }
-#inputVideo { 
-  width: 320px; 
-  margin: 0 auto; 
-  display: block; 
+#inputVideo {
+  width: 320px;
+  margin: 0 auto;
+  display: block;
 }
 #introIllustration {
   width: 100%;
