@@ -1,5 +1,5 @@
-var Box2D = require('./box2dnodeold.js');
-var lobby = require('./lobby.js')
+var Box2D = require('../vendor/box2dnodeold.js'),
+    lobby = require('./lobby.js');
 
 var worldHash = {};
 
