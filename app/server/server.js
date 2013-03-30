@@ -13,28 +13,34 @@ var express = require('express'),
     u       = require('underscore'),
     users   = {};
 
-server.listen(8000);
+server.listen(8080);
 
 app.get('/', function (req, res) {
-  res.sendfile(path.resolve(__dirname + '/../client/splashPage.html'));
+  res.sendfile(path.resolve(__dirname + '/../client/splashpage.html'));
 });
 
 app.get('/public', function (req, res) {
-  res.sendfile(path.resolve(__dirname + '/../client/index.html'));
-});
-
-//-> code for the uuid handler
-// var urlPrefix = 'http://localhost:8000/private/'
-// privateRoutes[uuid] = urlPrefix + uuid;
-
-u.each(lobby.privateRoutes, function (url, id, obj) {
-  app.get('/private/' + id , function (req, res) {
-    res.sendfile(path.resolve(__dirname + '/../client/index.html'));
-  });
+  res.sendfile(path.resolve(__dirname + '/../client/game.html'));
 });
 
 app.get('/room_id', function (req, res) {
-  res.end('http://localhost:8080/game');
+  var urlPrefix = 'http://10.0.1.120:8080/game/';
+  var id = uuid.v1();
+  lobby.privateRoutes[id] = urlPrefix + id;
+  res.end(urlPrefix + id);
+});
+//Need to add more informative response to requests for non-existent rooms.
+app.get('/game/:id', function (req, res) {
+  if (req.params.id.length === 36) {
+    var lobbyIdArray = u.keys(lobby.privateRoutes);
+    if (u.contains(lobbyIdArray, req.params.id)) {
+    res.sendfile(path.resolve(__dirname + '/../client/game.html'));
+    } else {
+    res.end();
+    }
+  } else {
+    res.end();
+  };
 });
 
 io.sockets.on('connection', function (socket) {
@@ -88,6 +94,7 @@ io.sockets.on('connection', function (socket) {
         room.user1          = user;
         room.user1.room     = room.roomID;
         lobby.rooms.waiting = room;
+        console.log('USER', user);
       }
     }
     user.emit('roomEcho', {room: user.room});
@@ -105,7 +112,7 @@ io.sockets.on('connection', function (socket) {
   };
 
   socket.on('playerReady', function (data) {
-    var thisRoom = lobby.rooms.active[user.room] || lobby.rooms.waiting;
+    var thisRoom = lobby.rooms.active[user.room] || lobby.rooms.waiting || lobby.rooms.privateWaiting[user.room];
     thisRoom.readyPlayers.push(data.player);
     console.log('READY PLAYERS', thisRoom.readyPlayers);
     if (thisRoom.readyPlayers.length === 2) {
