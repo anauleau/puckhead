@@ -26,8 +26,10 @@ var socket = io.connect('http://10.0.1.11');
 
 socket.on('hello', function(data) {
   console.log(data);
+   $('.playerId').append('<h6>You are in ' + data.room + '.</h6>');
 });
 
+socket.emit('hi');
 var begin = false;
 
 var videoInput = document.getElementById('inputVideo');
@@ -45,6 +47,13 @@ var player;
 
   socket.on('assignPlayerNumber', function(data) {
     player = data.player;
+    var colour;
+    if (player === 1) {
+      colour = 'red';
+    } else {
+      colour = 'blue';
+    }
+    $('.playerId').append('<h2>You are  ' + colour + '.</h2>');
   });
 
 $('.ready').click(function (e) {
@@ -69,8 +78,5 @@ $('.ready').click(function (e) {
     }
   });
 
-
-
-  socket.emit('hi');
 
 });

@@ -11,7 +11,7 @@ window.onload = function() {
   var gatesWidth = 5 * sizeUnit;
   var gatesHeight = 33 * sizeUnit;
 
-  var drawWorld = function(){
+  var drawWorld = function() {
 
     // Define a board dimensions and draw the board.
     paper = new Raphael(document.getElementById('canvas_container'), width, height);
@@ -62,7 +62,7 @@ window.onload = function() {
 
   drawWorld();
 
-var updateBoard = function( worldState ){
+var updateBoard = function( worldState ) {
     puck.attr('cx', worldState.puckX);
     puck.attr('cy', worldState.puckY);
     mallet1.attr('cx', worldState.mallet1X);
@@ -91,7 +91,7 @@ var updateBoard = function( worldState ){
     }
   };
 
-  socket.on('positionsUpdated', function(data){
+  socket.on('positionsUpdated', function(data) {
     updateBoard(data);
   });
 };

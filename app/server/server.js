@@ -72,7 +72,7 @@ io.sockets.on('connection', function (socket) {
   };
 
   socket.on('playerReady', function(data) {
-    var thisRoom = lobby.rooms.active[user.room];
+    var thisRoom = lobby.rooms.active[user.room] || lobby.rooms.waiting;
     thisRoom.readyPlayers.push(data.player);
 
     if (thisRoom.readyPlayers.length === 2) {
@@ -86,7 +86,6 @@ io.sockets.on('connection', function (socket) {
   });
 
   socket.on('move', function (data) {
-    console.log(data, 'fk-----');
     physics.updateMallet(data, user.room);
   });
 
