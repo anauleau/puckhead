@@ -16,7 +16,7 @@ window.onload = function() {
     // Define a board dimensions and draw the board.
     paper = new Raphael(document.getElementById('canvas_container'), width, height);
 
-    // Create gates.
+    // Draw gates.
     paper.rect(0, 0, gatesWidth, gatesHeight).attr({stroke: '#000', 'stroke-width': 2, fill:"180-#222:10-#555:20-#333"});
     paper.rect(0, height - gatesHeight, gatesWidth, gatesHeight).attr({stroke: '#000', 'stroke-width': 2, fill:"180-#222:10-#555:20-#333"});
     paper.rect(width - gatesWidth, 0, gatesWidth, gatesHeight).attr({stroke: '#000', 'stroke-width': 2, fill:"0-#222:10-#555:20-#333"});
@@ -28,16 +28,17 @@ window.onload = function() {
     paper.circle(width - gatesWidth, height / 2, height / 2);
     paper.circle(width / 2, height / 2, height / 5);
 
+    // Draw score table.
     score1 = paper.text(width / 2 - 4 * sizeUnit, 6 * sizeUnit, 0);
     score2 = paper.text(width / 2 + 4 * sizeUnit, 6 * sizeUnit, 0);
     score1.attr({"font-size":40, fill:"red"});
     score2.attr({"font-size":40, fill:"blue"});
 
-    // Create the puck.
+    // Draw the puck.
     puck = paper.circle(width / 2, height / 2, puckRadius);
     puck.attr({fill: "r(.5,.5)#555-#333:40#222:80-#333:90-#000"});
 
-    // Create the mallets.
+    // Draw the mallets.
     var makeMallet = function(player) {
       if (player === 1) {
         var mallet = paper.circle(height / 4, height / 2, malletRadius);
@@ -52,48 +53,53 @@ window.onload = function() {
     mallet1 = makeMallet(1);
     mallet2 = makeMallet(2);
 
-    // Draw marking.
-    paper.path("M" + width / 2 + ",0L" + width / 2 + "," + height);
-    paper.circle(gatesWidth, height / 2, height / 2);
-    paper.circle(width - gatesWidth, height / 2, height / 2);
-    paper.circle(width / 2, height / 2, height / 5);
-
   };
 
   drawWorld();
 
-var updateBoard = function( worldState ){
-    console.log('in updateWorld');
+  var updateBoard = function( worldState ){
+
+    // Update positions of the puck and the mallets according to the server physics.
     puck.attr('cx', worldState.puckX);
     puck.attr('cy', worldState.puckY);
     mallet1.attr('cx', worldState.mallet1X);
     mallet1.attr('cy', worldState.mallet1Y);
     mallet2.attr('cx', worldState.mallet2X);
     mallet2.attr('cy', worldState.mallet2Y);
+
+    // Update the first player's score.
     if ( worldState.score1 >= 5 ){
       score1.attr('text', 5);
       if (player === 1){
-        var message = paper.text(width / 2, height/2, 'You won!');
+        var result = 'You won!';
       } else {
-        var message = paper.text(width / 2, height/2, 'You lost!');
+        var result = 'You lost!';
       }
+      var message = paper.text(width / 2, height/2, result);
     } else {
       score1.attr('text', worldState.score1);
     }
+
+    // Update the second player's score.
     if ( worldState.score2 >= 5 ){
-      score1.attr('text', 5);
+      score2.attr('text', 5);
       if (player === 2){
-        var message = paper.text(width / 2, height/2, 'You won!');
+        var result = 'You won!';
       } else {
-        var message = paper.text(width / 2, height/2, 'You lost!');
+        var result = 'You lost!';
       }
+      var message = paper.text(width / 2, height/2, result);
     } else {
       score2.attr('text', worldState.score2);
     }
+
     message.attr("font-size", 80);
+
   };
 
+  // Update the game state when data about object's positions is received from the server.
   socket.on('positionsUpdated', function(data){
     updateBoard(data);
   });
+
 };
