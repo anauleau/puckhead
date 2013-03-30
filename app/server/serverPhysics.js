@@ -61,6 +61,7 @@ var createWorld = function(roomId, callback) {
   bodyDef.position.Set( width * worldCoeff, height * worldCoeff );
   world.CreateBody(bodyDef).CreateFixture(fixDef);
 
+  //creates puck
   bodyDef.type = b2Body.b2_dynamicBody;
   fixDef.shape = new b2CircleShape;
   fixDef.shape.SetRadius( puckRadius * worldCoeff );
@@ -69,6 +70,7 @@ var createWorld = function(roomId, callback) {
   thisWorld.puckBody.CreateFixture(fixDef);
   thisWorld.puckBody.SetLinearVelocity( new b2Vec2(4, 2) );  // Temp.
 
+  //creates mallet
   malletFixDef = new b2FixtureDef;
   malletFixDef.density = 100.0;
   malletFixDef.friction = 0.0;

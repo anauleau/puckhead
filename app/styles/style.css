@@ -20,6 +20,7 @@ svg {
   -ms-transform: scaleX(-1);
   transform : scaleX(-1);
   display: block;
+  margin: 0;
   position: absolute;
 }
 #curtain {
@@ -35,7 +36,7 @@ svg {
   margin: 20px;
 }
 .overlay {
-  margin: 0 auto;
+  margin: 0;
   position: absolute;
   width: 320px;
   height: 240px;
@@ -129,6 +130,7 @@ svg {
   height: 40px;
   text-align: center;
 }
+
 .privateUrl {
   font-size: 1.5em;
   color: red;
@@ -136,4 +138,10 @@ svg {
 .sendUrl {
   color: black;
   padding-right: 20px;
+}
+.playerId {
+  margin: 300px 10px;
+}
+.ready {
+  z-index: 1000000;
 }

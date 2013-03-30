@@ -30,6 +30,7 @@ var socket = io.connect(); // TIP: .connect with no args does auto-discovery
 
 socket.on('roomEcho', function (data) {
   console.log(data);
+   $('.playerId').append('<h6>You are in ' + data.room + '.</h6>');
 });
 
 socket.on('ready', function (data) {
@@ -46,6 +47,21 @@ htracker.init(videoInput, canvasInput);
 htracker.start();
 
 var player;
+
+  socket.on('bothPlayersReady', function() {
+    begin = true;
+  });
+
+  socket.on('assignPlayerNumber', function(data) {
+    player = data.player;
+    var colour;
+    if (player === 1) {
+      colour = 'red';
+    } else {
+      colour = 'blue';
+    }
+    $('.playerId').append('<h2>You are  ' + colour + '.</h2>');
+  });
 
 $('.ready').click(function (e) {
 
@@ -68,15 +84,5 @@ $('.ready').click(function (e) {
       socket.emit('move', position);
     }
   });
-
-  socket.on('bothPlayersReady', function() {
-    begin = true;
-  });
-
-  socket.on('assignPlayerNumber', function(data){
-    player = data;
-  });
-
-  socket.emit('hi');
 
 });

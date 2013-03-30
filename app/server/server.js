@@ -69,6 +69,7 @@ io.sockets.on('connection', function (socket) {
         room.user2.room   = room.roomID;
         room.user1.other  = room.user2.id;
         room.user2.other  = room.user1.id;
+        user.emit('assignPlayerNumber', {player: 2});
         lobby.rooms.privateWaiting[room.roomID] = undefined;
       } else {
         room                = new Room();
@@ -77,6 +78,7 @@ io.sockets.on('connection', function (socket) {
         room.user1          = user;
         room.user1.room     = room.roomID;
         lobby.rooms.privateWaiting[room.roomID] = room;
+        user.emit('assignPlayerNumber', {player: 1});
       }
     } else {
       if (lobby.rooms.waiting) {
@@ -87,6 +89,7 @@ io.sockets.on('connection', function (socket) {
         room.user2.room   = room.roomID;
         room.user1.other  = room.user2.id;
         room.user2.other  = room.user1.id;
+        user.emit('assignPlayerNumber', {player: 2});
         lobby.rooms.waiting = undefined;
       } else {
         room                = new Room();
@@ -94,6 +97,7 @@ io.sockets.on('connection', function (socket) {
         room.user1          = user;
         room.user1.room     = room.roomID;
         lobby.rooms.waiting = room;
+        user.emit('assignPlayerNumber', {player: 1});
         console.log('USER', user);
       }
     }
@@ -102,7 +106,7 @@ io.sockets.on('connection', function (socket) {
 
   var setUser = function (user) {
     var user = user;
-    var func = function (){
+    var func = function () {
           var worldState = physics.watchWorldState(user.room);
           user.emit('positionsUpdated', worldState);
           users[user.other].emit('positionsUpdated', worldState);
@@ -135,6 +139,7 @@ io.sockets.on('connection', function (socket) {
     delete users[socket];
     io.sockets.emit('user disconnected');
   });
+
 });
 
 //serves static files
