@@ -1,5 +1,5 @@
 #Puckhead
-[Play it!](puckhead.nodejitsu.com)
+[Play it!](http://puckhead.nodejitsu.com)
 
 A two-player air hockey game where you move your mallet with your head!
 
