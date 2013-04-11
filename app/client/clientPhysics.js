@@ -67,8 +67,8 @@ var updateBoard = function( worldState ) {
     mallet2.attr('cy', worldState.mallet2Y);
 
     // Update the first player's score.
-    if ( worldState.score1 >= 5 ){
-      score1.attr('text', 5);
+    if ( worldState.score1 >= 3 ){
+      score1.attr('text', 3);
       if (player === 1){
         var result = 'You won!';
       } else {
@@ -80,8 +80,8 @@ var updateBoard = function( worldState ) {
     }
 
     // Update the second player's score.
-    if ( worldState.score2 >= 5 ){
-      score2.attr('text', 5);
+    if ( worldState.score2 >= 3 ){
+      score2.attr('text', 3);
       if (player === 2){
         var result = 'You won!';
       } else {

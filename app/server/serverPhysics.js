@@ -104,7 +104,7 @@ exports.updateMallet = function( malletData, roomId ) {
 };
 
 var updateScore = function(roomId) {
-  if ( lobby.rooms.active[roomId].score1 >= 5 || lobby.rooms.active[roomId].score2 >= 5 ){
+  if ( lobby.rooms.active[roomId].score1 >= 3 || lobby.rooms.active[roomId].score2 >= 3 ){
     stop();
   } else if ( worldHash[roomId].puckBody.GetPosition().x < gatesWidth * worldCoeff ){
     lobby.rooms.active[roomId].score2++;

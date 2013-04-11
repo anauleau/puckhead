@@ -24,7 +24,7 @@ app.get('/public', function (req, res) {
 });
 
 app.get('/room_id', function (req, res) {
-  var urlPrefix = 'http://10.0.1.120:8080/game/';
+  var urlPrefix = 'http://puckhead.nodejitsu.com/game/';
   var id = uuid.v1();
   lobby.privateRoutes[id] = urlPrefix + id;
   res.end(urlPrefix + id);
