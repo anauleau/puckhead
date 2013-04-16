@@ -144,7 +144,7 @@ var updatePuck = function(roomId) {
     };
 
     return func;
-  };
+};
 
 exports.watchWorldState = function(roomId) {
   var newWorldState = {};

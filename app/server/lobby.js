@@ -5,7 +5,6 @@ var rooms = {
   privateWaiting: {}
 };
 
-
 //change name to better represent what this hash is storing
 
 //just store uuid as opposed to the entire url

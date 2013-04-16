@@ -1,4 +1,4 @@
-var basicUrl = 'http://puckhead.nodejitsu.com';
+var basicUrl = 'http://localhost:8080';
 var roomUrl;
 
 $(document).ready(function(){

@@ -24,7 +24,7 @@ app.get('/public', function (req, res) {
 });
 
 app.get('/room_id', function (req, res) {
-  var urlPrefix = 'http://puckhead.nodejitsu.com/game/';
+  var urlPrefix = 'http://localhost:8080/game/';
   var id = uuid.v1();
   lobby.privateRoutes[id] = urlPrefix + id;
   res.end(urlPrefix + id);
@@ -59,6 +59,10 @@ io.sockets.on('connection', function (socket) {
     users[socket.id]  = new User(socket),
     user              = users[socket.id],
     user.url          = url;
+
+    //add logic to new room instantiation depending on the situation.
+    //on client side if room is not full display infomation to user and limit their input
+    //don't allow illegal moves.
 
     if (u.contains(lobby.privateRoutes, user.url)) {
       if (lobby.rooms.privateWaiting[user.url]){
@@ -118,9 +122,7 @@ io.sockets.on('connection', function (socket) {
   socket.on('playerReady', function (data) {
     var thisRoom = lobby.rooms.active[user.room] || lobby.rooms.waiting || lobby.rooms.privateWaiting[user.room];
     thisRoom.readyPlayers.push(data.player);
-    console.log('READY PLAYERS', thisRoom.readyPlayers);
     if (thisRoom.readyPlayers.length === 2) {
-      //emits both players ready to each player from the other
       user.emit('bothPlayersReady');
       users[user.other].emit('bothPlayersReady');
       thisRoom.world = physics.createWorld(user.room, function () {
@@ -134,7 +136,6 @@ io.sockets.on('connection', function (socket) {
     physics.updateMallet(data, user.room);
   });
 
-  //handles disconnects and subsequently deletes the user
   socket.on('disconnect', function () {
     delete users[socket];
     io.sockets.emit('user disconnected');
@@ -142,8 +143,6 @@ io.sockets.on('connection', function (socket) {
 
 });
 
-//serves static files
 app.use(express.static(__dirname + '/../client'));
 app.use(express.static(__dirname + '/../styles'));
 app.use(express.static(__dirname + '/../vendor'));
-
